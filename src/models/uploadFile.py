@@ -1,2 +1,2 @@
 def uploadFile(parameters):
-    pass
+    return parameters

@@ -5,10 +5,10 @@ from uploadFile import *
 app = FastAPI()
 
 
-@app.post("/endpoint_test")
+@app.get("/endpoint_test")
 def fctTest(parameters: str):
     '''
-    documentation
+    afficher parameters
     '''
 
     try:
