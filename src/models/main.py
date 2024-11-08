@@ -1,19 +1,15 @@
-from fastapi import FastAPI
-
-from uploadFile import *
+from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
 
-@app.get("/endpoint_test")
-def fctTest(parameters: str):
-    '''
-    afficher parameters
-    '''
-
+@app.post("/uploadfile/")
+def uploadFile(file: UploadFile = File(...)):
+    """
+    Endpoint pour upload un fichier. Le fichier est enregistré dans Stockify/uploadDirectory
+    """
     try:
-        return (
-            {"test": "test",
-             "Function Result": uploadFile(parameters)})
+        return {"Info": "Success", "Function Result": uploadFile(file)}
+
     except Exception as e:
-        return ({"Info": "Fail", "Error": str(e)})
+        return {"Info": "Fail", "Error": str(e)}
