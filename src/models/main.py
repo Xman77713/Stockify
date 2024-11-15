@@ -7,6 +7,9 @@ from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
+if not os.path.exists("src/models/uploadDirectory"):
+    os.makedirs("src/models/uploadDirectory")
+
 
 @app.post("/uploadfile/")
 async def uploadFileAPI(file: UploadFile = File(...)):
@@ -14,7 +17,7 @@ async def uploadFileAPI(file: UploadFile = File(...)):
     Endpoint pour upload un fichier. Le fichier est enregistré dans Stockify/uploadDirectory
     """
     try:
-        file_path = os.path.join("uploadDirectory", file.filename)
+        file_path = os.path.join("src/models/uploadDirectory", file.filename)
 
         with open(file_path, "wb") as directory:
             directory.write(await file.read())
@@ -43,7 +46,7 @@ def listFilesAPI():
     Endpoint pour obtenir la liste des fichiers disponibles dans uploadDirectory
     """
     try:
-        return {"Info": "Success", "Function Result": os.listdir("uploadDirectory")}
+        return {"Info": "Success", "Function Result": os.listdir("src/models/uploadDirectory")}
 
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
