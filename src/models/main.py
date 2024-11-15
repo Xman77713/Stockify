@@ -1,19 +1,67 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 
-from uploadFile import *
+import deleteFile
+import readFile
+import uploadFile
 
 app = FastAPI()
 
 
-@app.get("/endpoint_test")
-def fctTest(parameters: str):
-    '''
-    afficher parameters
-    '''
-
+@app.post("/uploadfile/")
+async def uploadFileAPI(file: UploadFile = File(...)):
+    """
+    Endpoint pour upload un fichier. Le fichier est enregistré dans Stockify/uploadDirectory
+    """
     try:
-        return (
-            {"test": "test",
-             "Function Result": uploadFile(parameters)})
+        return {"Info": "Success", "Function Result": await uploadFile.uploadFile(file)}
+
     except Exception as e:
-        return ({"Info": "Fail", "Error": str(e)})
+        return {"Info": "Fail", "Error": str(e)}
+
+
+@app.delete("/deletefile/")
+def deleteFileAPI(filename: str):
+    """
+    Endpoint pour delete un fichier par le nom
+    """
+    try:
+        return {"Info": "Success", "Function Result": deleteFile.deleteFile(filename)}
+
+    except Exception as e:
+        return {"Info": "Fail", "Error": str(e)}
+
+
+@app.get("/files/")
+def listFilesAPI():
+    """
+    Endpoint pour obtenir la liste des fichiers disponibles dans uploadDirectory
+    """
+    try:
+        return {"Info": "Success", "Function Result": readFile.readListeFile()}
+
+    except Exception as e:
+        return {"Info": "Fail", "Error": str(e)}
+
+
+@app.get("/file/")
+def readFileByNameAPI(filename: str):
+    """
+    Endpoint pour obtenir la liste des fichiers disponibles dans uploadDirectory
+    """
+    try:
+        return {"Info": "Success", "Function Result": readFile.readFileByName(filename)}
+
+    except Exception as e:
+        return {"Info": "Fail", "Error": str(e)}
+
+
+@app.get("/downloadfile/")
+def downloadFileAPI(filename: str):
+    """
+    Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
+    """
+    try:
+        return {"Info": "Success", "Function Result": readFile.downloadFile(filename)}
+
+    except Exception as e:
+        return {"Info": "Fail", "Error": str(e)}
