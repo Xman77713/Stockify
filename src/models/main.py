@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 
-# import uploadFile
+import uploadFile
 
 app = FastAPI()
 
@@ -11,7 +11,7 @@ async def uploadFileAPI(file: UploadFile = File(...)):
     Endpoint pour upload un fichier. Le fichier est enregistré dans Stockify/uploadDirectory
     """
     try:
-        return {"Info": "Success", "Function Result": await print("haha")}  # await uploadFile.uploadFile(file)}
+        return {"Info": "Success", "Function Result": await uploadFile.uploadFile(file)}
 
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
