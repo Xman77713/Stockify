@@ -1,8 +1,11 @@
 import os
 
 
-def deleteFile(filename, uploadDirectory):
+def deleteFileByName(filename, uploadDirectory):
     file_path = os.path.join(uploadDirectory, filename)
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{filename} does not exist in the directory")
 
     os.remove(file_path)
 
