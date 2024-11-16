@@ -40,7 +40,7 @@ from fastapi.responses import FileResponse
 import os
 
 
-def downloadFile(filename, uploadDirectory):
+def downloadFileByName(filename, uploadDirectory):
     file_path = os.path.join(uploadDirectory, filename)
 
     if not os.path.exists(file_path):
