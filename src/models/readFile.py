@@ -1,6 +1,6 @@
-import mimetypes
+import os
 
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from src.models.exception import InvalidFileTypeError
 
 
@@ -23,8 +23,11 @@ def readFileByName(filename, uploadDirectory):
     elif fileExtension == ".pdf":
         return FileResponse(str(file_path), media_type="application/pdf", filename=filename)
 
-    elif fileExtension in [".jpg", ".jpeg", ".png"]:
-        return FileResponse(str(file_path), media_type=mimetypes.guess_type(str(file_path)[0]), filename=filename)
+    elif fileExtension in [".jpg", ".jpeg"]:
+        return FileResponse(str(file_path), media_type="image/jpeg", filename=filename)
+
+    elif fileExtension == ".png":
+        return FileResponse(str(file_path), media_type="image/png", filename=filename)
 
     elif fileExtension == ".csv":
         return FileResponse(str(file_path), media_type="text/csv", filename=filename)
@@ -36,19 +39,10 @@ def readFileByName(filename, uploadDirectory):
         raise InvalidFileTypeError(f"File type '{fileExtension}' is not supported for reading.")
 
 
-from fastapi.responses import FileResponse
-import os
-
-
 def downloadFileByName(filename, uploadDirectory):
     file_path = os.path.join(uploadDirectory, filename)
 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File {filename} not found.")
 
-    file_extension = os.path.splitext(file_path)[1].lower()
-
-    if file_extension in [".txt", ".pdf", ".jpg", ".jpeg", ".png", ".csv", ".json"]:
-        return FileResponse(str(file_path), media_type=mimetypes.guess_type(str(file_path)[0]), filename=filename)
-    else:
-        raise InvalidFileTypeError(f"File type '{file_extension}' is not supported for download.")
+    return FileResponse(str(file_path), media_type="application/octet-stream", filename=filename)
