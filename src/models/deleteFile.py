@@ -1,8 +1,8 @@
 import os
 
 
-def deleteFile(filename):
-    file_path = os.path.join("uploadDirectory", filename)
+def deleteFile(filename, uploadDirectory):
+    file_path = os.path.join(uploadDirectory, filename)
 
     os.remove(file_path)
 
