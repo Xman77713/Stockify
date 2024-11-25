@@ -1,15 +1,28 @@
 import os
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 from src.models.deleteFile import deleteFileByName
 from src.models.readFile import readListeFile, readFileByName, downloadFileByName
 from src.models.uploadFile import uploadFile
 
 app = FastAPI()
+
 uploadDirectory = "src/models/uploadDirectory"
 
 if not os.path.exists(uploadDirectory):
     os.makedirs(uploadDirectory)
+
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+templates = Jinja2Templates(directory="src/views")
+
+@app.get("/", response_class=HTMLResponse)
+async def read_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/uploadfile/")

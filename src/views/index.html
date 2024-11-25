@@ -2,9 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Stockify</title>
+    <link rel="stylesheet" href="static/design.css">
 </head>
 <body>
+    <h1>Bienvenue sur Stockify</h1>
+    <h2>Vous pouvez stocker tous vos fichiers important</h2>
+    <form id="formForUpload">
+        <input type="file" id="fileInput" name="file">
+        <button type="button" id="uploadButton">Téléchargement</button>
+    </form>
+    <div id="result"></div>
 
+    <script>
+        document.getElementById("uploadButton").addEventListener("click", async () => {
+            const formData = new FormData();
+            const fileInput = document.getElementById("fileInput");
+
+            if(!fileInput.files[0]) {
+                document.getElementById("result").innerText = "Aucun fichier selectionné.";
+                return;
+            }
+
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch("/uploadfile/", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if(response.ok) {
+                    document.getElementById("result").innerText = `Réussite`;
+                } else {
+                    document.getElementById("result").innerText = `Échec`;
+                }
+            } catch (err) {
+                document.getElementById("result").innerText = `Erreur`;
+            }
+        });
+    </script>
 </body>
 </html>
