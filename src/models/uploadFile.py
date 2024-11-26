@@ -4,7 +4,7 @@ from src.models.exception import InvalidFileTypeError
 
 
 async def uploadFile(file, uploadDirectory):
-    extension = {".txt", ".pdf", ".jpg", ".png", "jpeg", ".json", ".csv"}
+    extension = {".txt", ".pdf", ".jpg", ".png", ".jpeg", ".json", ".csv"}
     file_extension = os.path.splitext(file.filename)[1].lower()
 
     if file_extension not in extension:
