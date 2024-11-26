@@ -4,8 +4,11 @@ from fastapi.responses import FileResponse, PlainTextResponse
 from src.models.exception import InvalidFileTypeError
 
 
-def readListeFile(uploadDirectory):
-    return os.listdir(uploadDirectory)
+def readListeFile(uploadDirectory, cursor):
+    cursor.execute("SELECT path FROM file")
+    LPath = [paths[0].split('\\')[-1] for paths in cursor.fetchall()]
+
+    return LPath
 
 
 def readFileByName(filename, uploadDirectory):

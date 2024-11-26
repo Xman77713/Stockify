@@ -3,7 +3,7 @@ import os
 from src.models.exception import InvalidFileTypeError
 
 
-async def uploadFile(file, uploadDirectory):
+async def uploadFile(file, uploadDirectory, conn, cursor):
     extension = {".txt", ".pdf", ".jpg", ".png", ".jpeg", ".json", ".csv"}
     file_extension = os.path.splitext(file.filename)[1].lower()
 
@@ -14,5 +14,8 @@ async def uploadFile(file, uploadDirectory):
 
     with open(file_path, "wb") as directory:
         directory.write(await file.read())
+
+    cursor.execute("INSERT INTO file (path) VALUES (%s)", (file_path,))
+    conn.commit()
 
     return {"filename": file.filename, "message": "File successfully saved"}
