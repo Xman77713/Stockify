@@ -1,41 +1,47 @@
 import os
 
-from fastapi.responses import FileResponse, PlainTextResponse
-from src.models.exception import InvalidFileTypeError
+from fastapi.responses import FileResponse
+from starlette.responses import PlainTextResponse
+
+from models.exception import InvalidFileTypeError
 
 
-def readListeFile(uploadDirectory, cursor):
+def readListeFile(cursor):
     cursor.execute("SELECT path FROM file")
-    LPath = [paths[0].split('\\')[-1] for paths in cursor.fetchall()]
+    try:
+        return [paths[0].split('\\')[-1] for paths in cursor.fetchall()]
+    except:
+        return []
 
-    return LPath
 
-
-def readFileByName(filename, uploadDirectory):
+def readFileByName(filename, uploadDirectory, cursor):
     file_path = os.path.join(uploadDirectory, filename)
+    cursor.execute("SELECT path FROM file WHERE path = (%s)", (file_path,))
+    queryResult = cursor.fetchall()
 
-    if not os.path.exists(file_path):
+    if not queryResult:
         raise FileNotFoundError(f"{filename} does not exist in the directory")
 
-    fileExtension = os.path.splitext(file_path)[1].lower()
-    if fileExtension == ".txt":
-        with open(file_path, "r") as file:
+    fileExtension = queryResult[0][0].split(".")[-1].lower()
+
+    if fileExtension == "txt":
+        with open(queryResult[0][0], "r") as file:
             content = file.read()
         return PlainTextResponse(content, media_type="text/plain")
 
-    elif fileExtension == ".pdf":
+    elif fileExtension == "pdf":
         return FileResponse(str(file_path), media_type="application/pdf", filename=filename)
 
-    elif fileExtension in [".jpg", ".jpeg"]:
+    elif fileExtension in ["jpg", "jpeg"]:
         return FileResponse(str(file_path), media_type="image/jpeg", filename=filename)
 
-    elif fileExtension == ".png":
+    elif fileExtension == "png":
         return FileResponse(str(file_path), media_type="image/png", filename=filename)
 
-    elif fileExtension == ".csv":
+    elif fileExtension == "csv":
         return FileResponse(str(file_path), media_type="text/csv", filename=filename)
 
-    elif fileExtension == ".json":
+    elif fileExtension == "json":
         return FileResponse(str(file_path), media_type="application/json", filename=filename)
 
     else:

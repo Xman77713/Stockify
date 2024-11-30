@@ -4,7 +4,8 @@ import os
 def deleteFileByName(filename, uploadDirectory, conn, cursor):
     file_path = os.path.join(uploadDirectory, filename)
 
-    if not os.path.exists(file_path):
+    cursor.execute("SELECT (path) FROM file WHERE path = (%s)", (file_path,))
+    if not cursor.fetchall():
         raise FileNotFoundError(f"{filename} does not exist in the directory")
 
     os.remove(file_path)
@@ -17,12 +18,13 @@ def deleteFileByName(filename, uploadDirectory, conn, cursor):
 
 def deleteFileById(id, conn, cursor):
     cursor.execute("SELECT (path) FROM file WHERE id = (%s)", (id,))
-    file_path = cursor.fetchall()[0][0]
+    queryResult = cursor.fetchall()
 
+    if not queryResult:
+        raise FileNotFoundError(f"The file with id={id} does not exist in the directory")
+
+    file_path = queryResult[0][0]
     filename = file_path.split('\\')[-1]
-
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"{id} does not exist in the directory")
 
     cursor.execute("DELETE FROM file WHERE id = (%s)", (id,))
     conn.commit()

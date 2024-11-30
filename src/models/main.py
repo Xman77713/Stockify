@@ -74,7 +74,9 @@ try:
             Endpoint to get the list of available file's names in src/models/uploadDirectory
             """
             try:
-                return {"Info": "Success", "Function Result": readListeFile(uploadDirectory, cursor)}
+                return {"Info": "Success", "Function Result": readListeFile(cursor)}
+            except FileNotFoundError:
+                return {"Info": "Success", "Function Result": "No file(s) in the directory"}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
@@ -85,7 +87,7 @@ try:
             Endpoint to get a file by name
             """
             try:
-                return {"Info": "Success", "Function Result": readFileByName(filename, uploadDirectory)}
+                return {"Info": "Success", "Function Result": readFileByName(filename, uploadDirectory, cursor)}
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -98,7 +100,7 @@ try:
             Endpoint to get a file by name
             """
             try:
-                return {"Info": "Success", "Function Result": readFileById(id, uploadDirectory)}
+                return {"Info": "Success", "Function Result": readFileById(id, uploadDirectory, cursor)}
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -111,7 +113,7 @@ try:
             Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
             """
             try:
-                return downloadFileByName(filename, uploadDirectory)
+                return downloadFileByName(filename, uploadDirectory, cursor)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -124,35 +126,7 @@ try:
             Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
             """
             try:
-                return downloadFileById(id, uploadDirectory)
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-            except Exception as e:
-                return {"Info": "Fail", "Error": str(e)}
-
-
-        @app.post("/testPOSTBDD/")
-        def testPOST_BDD():
-            """
-            Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
-            """
-            try:
-                cursor.execute('INSERT INTO testTable (id, nom, prenom) VALUES ("2","e","r")')
-                return {"Info": "Success", "Function Result": "bien enregistré"}
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-            except Exception as e:
-                return {"Info": "Fail", "Error": str(e)}
-
-
-        @app.get("/testGETBDD/")
-        def testGET_BDD():
-            """
-            Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
-            """
-            try:
-                cursor.execute('SELECT * FROM testTable')
-                return {"Info": "Success", "Function Result": cursor.fetchall()}
+                return downloadFileById(id, uploadDirectory, cursor)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
