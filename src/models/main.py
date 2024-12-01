@@ -4,7 +4,7 @@ import mysql.connector
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from src.models.deleteFile import deleteFileByName, deleteFileById
-from src.models.readFile import readListeFile, readFileByName, downloadFileByName
+from src.models.readFile import readListeFile, readFileByName, readFileById, downloadFileByName
 from src.models.uploadFile import uploadFile
 
 load_dotenv()
@@ -48,7 +48,7 @@ try:
             Endpoint to delete a file by name
             """
             try:
-                return {"Info": "Success", "Function Result": deleteFileByName(filename, uploadDirectory, conn, cursor)}
+                return {"Info": "Success", "Function Result": deleteFileByName(filename, conn, cursor)}
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -100,7 +100,7 @@ try:
             Endpoint to get a file by name
             """
             try:
-                return {"Info": "Success", "Function Result": readFileById(id, uploadDirectory, cursor)}
+                return {"Info": "Success", "Function Result": readFileById(id, cursor)}
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
