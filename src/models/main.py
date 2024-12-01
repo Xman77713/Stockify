@@ -4,8 +4,9 @@ import mysql.connector
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from src.models.deleteFile import deleteFileByName, deleteFileById
-from src.models.readFile import readListeFile, readFileByName, readFileById, downloadFileByName
+from src.models.readFile import readListeFile, readFileByName, readFileById
 from src.models.uploadFile import uploadFile
+from src.models.downloadFile import downloadFileByName, downloadFileById
 
 load_dotenv()
 
@@ -87,7 +88,7 @@ try:
             Endpoint to get a file by name
             """
             try:
-                return {"Info": "Success", "Function Result": readFileByName(filename, uploadDirectory, cursor)}
+                return {"Info": "Success", "Function Result": readFileByName(filename, cursor)}
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -113,7 +114,7 @@ try:
             Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
             """
             try:
-                return downloadFileByName(filename, uploadDirectory, cursor)
+                return downloadFileByName(filename, cursor)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -126,7 +127,7 @@ try:
             Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
             """
             try:
-                return downloadFileById(id, uploadDirectory, cursor)
+                return downloadFileById(id, cursor)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
