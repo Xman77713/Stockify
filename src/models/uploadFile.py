@@ -22,7 +22,7 @@ async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, reque
 
     encryptFilePath = encryptChar(filePath.encode("utf-8"), key)
 
-    downloadLink = f"{request.base_url}/downloadfilelink/{encryptFilePath}"
+    downloadLink = f"{request.base_url}downloadfilelink/{encryptFilePath}"
 
     print(downloadLink)
 
