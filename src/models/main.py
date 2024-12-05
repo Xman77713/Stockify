@@ -2,8 +2,9 @@ import os
 
 from fastapi import FastAPI, UploadFile, HTTPException, BackgroundTasks
 from src.models.deleteFile import deleteFileByName
-from src.models.readFile import readListeFile, readFileByName, downloadFileByName
+from src.models.readFile import readListeFile, downloadFileByFilePath
 from src.models.uploadFile import uploadFile
+from starlette.requests import Request
 
 app = FastAPI()
 uploadDirectory = "src/models/uploadDirectory"
@@ -16,12 +17,12 @@ if not os.path.exists(uploadDirectoryTemp):
     os.makedirs(uploadDirectoryTemp)
 
 @app.post("/uploadfile/")
-async def uploadFileAPI(file: UploadFile, password: str):
+async def uploadFileAPI(file: UploadFile, password: str, request: Request):
     """
     Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
     """
     try:
-        return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, uploadDirectoryTemp, password)}
+        return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, request)}
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
 
@@ -49,27 +50,13 @@ def listFilesAPI():
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
 
-
-@app.get("/file/")
-def readFileByNameAPI(filename: str):
-    """
-    Endpoint to get a file by name
-    """
-    try:
-        return {"Info": "Success", "Function Result": readFileByName(filename, uploadDirectory)}
-    except FileNotFoundError:
-        return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-    except Exception as e:
-        return {"Info": "Fail", "Error": str(e)}
-
-
-@app.get("/downloadfile/")
-def downloadFileByNameAPI(filename: str, password: str, bgTask: BackgroundTasks):
+@app.get("/downloadfilelink/{filePath}")
+def downloadFileByLink(filePath: str, password: str, bgTask: BackgroundTasks):
     """
     Endpoint to download a file
     """
     try:
-        return downloadFileByName(filename, uploadDirectory, uploadDirectoryTemp, password, bgTask)
+        return downloadFileByFilePath(filePath, uploadDirectoryTemp, password, bgTask)
     except FileNotFoundError:
         return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
     except Exception as e:
