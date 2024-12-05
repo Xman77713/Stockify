@@ -1,6 +1,6 @@
 import os
 
-from fastapi import FastAPI, UploadFile, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Form, UploadFile, HTTPException, BackgroundTasks
 from src.models.deleteFile import deleteFileByName
 from src.models.readFile import readListeFile, downloadFileByFilePath
 from src.models.uploadFile import uploadFile
@@ -17,7 +17,7 @@ if not os.path.exists(uploadDirectoryTemp):
     os.makedirs(uploadDirectoryTemp)
 
 @app.post("/uploadfile/")
-async def uploadFileAPI(file: UploadFile, password: str, request: Request):
+async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Request = None):
     """
     Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
     """
@@ -50,8 +50,8 @@ def listFilesAPI():
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
 
-@app.get("/downloadfilelink/{filePath}")
-def downloadFileByLink(filePath: str, password: str, bgTask: BackgroundTasks):
+@app.post("/downloadfilelink/")
+def downloadFileByLink(password: str = Form(...), filePath: str = "", bgTask: BackgroundTasks = None):
     """
     Endpoint to download a file
     """
