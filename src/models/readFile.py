@@ -14,7 +14,7 @@ def downloadFileByFilePath(filePath, uploadDirectoryTemp, password, bgTask):
     decryptedFilePath = decryptChar(filePath, key)
     print(len(decryptedFilePath))
     print(decryptedFilePath)
-    filename = decryptedFilePath.split("\\")[-1]
+    filename = decryptedFilePath.split("/")[-1]
     filePathTemp = os.path.join(uploadDirectoryTemp,decryptedFilePath.split("/")[-1])
     print(len(filePathTemp))
     print(filePathTemp)
