@@ -14,9 +14,6 @@ async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, reque
     filePathTemp = os.path.join(uploadDirectoryTemp,file.filename)
     filePath = os.path.join(uploadDirectory, file.filename)
 
-    print(len(filePath))
-    print(filePath)
-
     with open(filePathTemp, "wb") as directory:
         directory.write(await file.read())
 

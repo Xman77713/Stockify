@@ -12,12 +12,8 @@ def readListeFile(uploadDirectory):
 def downloadFileByFilePath(filePath, uploadDirectoryTemp, password, bgTask):
     key = createKey(password)
     decryptedFilePath = decryptChar(filePath, key)
-    print(len(decryptedFilePath))
-    print(decryptedFilePath)
     filename = decryptedFilePath.split("/")[-1]
     filePathTemp = os.path.join(uploadDirectoryTemp,filename)
-    print(len(filePathTemp))
-    print(filePathTemp)
     result = decryptFile(decryptedFilePath, key)
 
     with open(filePathTemp, "wb") as directory:
