@@ -1,7 +1,7 @@
 import os
 
 from fastapi import FastAPI, Form, UploadFile, HTTPException, BackgroundTasks
-from src.models.deleteFile import deleteFileByName
+from src.models.deleteFile import deleteFiles
 from src.models.readFile import readListeFile, downloadFileByFilePath
 from src.models.uploadFile import uploadFile
 from starlette.requests import Request
@@ -32,7 +32,7 @@ async def read_index(request: Request):
 @app.post("/uploadfile/")
 async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Request = None):
     """
-    Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
+    Endpoint POST to upload a file. The encrypted file is saved in Stockify/src/models/uploadDirectory
     """
     try:
         return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, request)}
@@ -41,12 +41,12 @@ async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Re
 
 
 @app.delete("/deletefile/")
-def deleteFileByNameAPI(filename: str):
+def deleteFilesAPI():
     """
-    Endpoint to delete a file by name
+    Endpoint DELETE to delete a file by name. For developer
     """
     try:
-        return {"Info": "Success", "Function Result": deleteFileByName(filename, uploadDirectory)}
+        return {"Info": "Success", "Function Result": deleteFiles(uploadDirectory)}
     except FileNotFoundError:
         return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
     except Exception as e:
@@ -56,7 +56,7 @@ def deleteFileByNameAPI(filename: str):
 @app.get("/files/")
 def listFilesAPI():
     """
-    Endpoint to get the list of available file's names in src/models/uploadDirectory
+    Endpoint GET to get the list of available file's names in src/models/uploadDirectory. For developer
     """
     try:
         return {"Info": "Success", "Function Result": readListeFile(uploadDirectory)}
@@ -66,7 +66,7 @@ def listFilesAPI():
 @app.post("/downloadfilelink/")
 def downloadFileByLink(password: str = Form(...), filePath: str = "", bgTask: BackgroundTasks = None):
     """
-    Endpoint to download a file
+    Endpoint POST to download a file
     """
     try:
         return downloadFileByFilePath(filePath, uploadDirectoryTemp, password, bgTask)
@@ -78,7 +78,7 @@ def downloadFileByLink(password: str = Form(...), filePath: str = "", bgTask: Ba
 @app.get("/downloadfilelink/{filePath}")
 def page(request: Request, filePath: str):  #nom à changer TODO
     """
-    Endpoint to get a HTML page
+    Endpoint GET to get a HTML page before downloading the asked file
     """
     try:
         return None #page qui demande mdp, récupère le filePath de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et filePath) TODO
