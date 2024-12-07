@@ -14,6 +14,9 @@ async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, reque
     filePathTemp = os.path.join(uploadDirectoryTemp,file.filename)
     filePath = os.path.join(uploadDirectory, file.filename)
 
+    filePath = filePath.replace('\\','/')
+    filePathTemp = filePathTemp.replace('\\','/')
+
     print(filePath)
 
     with open(filePathTemp, "wb") as directory:
@@ -25,8 +28,6 @@ async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, reque
     encryptFilePath = encryptChar(filePath.encode("utf-8"), key)
 
     downloadLink = f"{request.base_url}downloadfilelink/{encryptFilePath}"
-
-    print(downloadLink)
 
     os.remove(filePathTemp)
 

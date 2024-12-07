@@ -5,10 +5,13 @@ from src.models.deleteFile import deleteFileByName
 from src.models.readFile import readListeFile, downloadFileByFilePath
 from src.models.uploadFile import uploadFile
 from starlette.requests import Request
+from starlette.templating import Jinja2Templates
 
 app = FastAPI()
 uploadDirectory = "src/models/uploadDirectory"
 uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
+
+templates = Jinja2Templates(directory="src/views")
 
 if not os.path.exists(uploadDirectory):
     os.makedirs(uploadDirectory)
@@ -57,6 +60,19 @@ def downloadFileByLink(password: str = Form(...), filePath: str = "", bgTask: Ba
     """
     try:
         return downloadFileByFilePath(filePath, uploadDirectoryTemp, password, bgTask)
+    except FileNotFoundError:
+        return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
+    except Exception as e:
+        return {"Info": "Fail", "Error": str(e)}
+
+@app.get("/downloadfilelink/{filePath}")
+def page(request: Request, filePath: str):  #nom à changer TODO
+    """
+    Endpoint to get a HTML page
+    """
+    try:
+        return None #page qui demande mdp, récupère le filePath de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et filePath) TODO
+        #return templates.TemplateResponse("index.html", {"request": request})
     except FileNotFoundError:
         return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
     except Exception as e:
