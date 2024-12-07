@@ -5,6 +5,8 @@ from src.models.deleteFile import deleteFileByName
 from src.models.readFile import readListeFile, downloadFileByFilePath
 from src.models.uploadFile import uploadFile
 from starlette.requests import Request
+from starlette.responses import HTMLResponse
+from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 app = FastAPI()
