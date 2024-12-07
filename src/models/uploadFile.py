@@ -11,18 +11,20 @@ async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, reque
     if file_extension not in extension:
         raise InvalidFileTypeError(f"File type '{file_extension}' is not allowed.")
 
-    filePathTemp = os.path.join(uploadDirectoryTemp,file.filename)
-    filePath = os.path.join(uploadDirectory, file.filename)
+    filename = file.filename
+
+    key = createKey(password)
+    encryptFilename = encryptChar(filename.encode("utf-8"), key)
+
+    filePathTemp = os.path.join(uploadDirectoryTemp,encryptFilename)
+    filePath = os.path.join(uploadDirectory, encryptFilename)
 
     filePath = filePath.replace('\\','/')
     filePathTemp = filePathTemp.replace('\\','/')
 
-    print(filePath)
-
     with open(filePathTemp, "wb") as directory:
         directory.write(await file.read())
 
-    key = createKey(password)
     result = encryptFile(filePathTemp, key)
 
     encryptFilePath = encryptChar(filePath.encode("utf-8"), key)
@@ -35,4 +37,4 @@ async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, reque
         directory.write(result[0])
         directory.write(result[1])
 
-    return {"filename": file.filename, "download link": downloadLink, "message": "File successfully saved"}
+    return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}

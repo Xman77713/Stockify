@@ -7,8 +7,6 @@ def createKey(password):
     return hashlib.sha256(password.encode()).digest()
 
 def encryptFile(filePath, key):
-    filePath = filePath.replace('\\','/')
-
     with open(filePath, "rb") as file:
         data = file.read()
 
@@ -18,8 +16,6 @@ def encryptFile(filePath, key):
     return cipher.iv, cipher_data
 
 def decryptFile(filePath, key):
-    filePath = filePath.replace('\\','/')
-
     with open(filePath, "rb") as f:
         iv = f.read(AES.block_size)
         cipher_data = f.read()

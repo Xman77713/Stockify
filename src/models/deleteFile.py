@@ -1,16 +1,11 @@
 import os
 
 
-def deleteFileByName(filename, uploadDirectory):
-    filePath = os.path.join(uploadDirectory, filename)
-    filePath = filePath.replace('\\','/')
+def deleteFiles(uploadDirectory):
+    for filename in os.listdir(uploadDirectory):
+        os.remove(os.path.join(uploadDirectory, filename))
 
-    if not os.path.exists(filePath):
-        raise FileNotFoundError(f"{filename} does not exist in the directory")
-
-    os.remove(filePath)
-
-    return {"filename": filename, "message": "File successfully deleted"}
+    return {"message": "uploadDirectory successfully cleared"}
 
 def deleteFileByPath(filePath):
     filePath = filePath.replace('\\','/')
