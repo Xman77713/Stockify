@@ -5,9 +5,9 @@ from src.models.exception import InvalidFileTypeError
 
 async def uploadFile(file, password, uploadDirectory, uploadDirectoryTemp, conn, cursor, request):
     filename = file.filename
-    file_extension = filename.split('.')[1].lower()
+    file_extension = os.path.splitext(filename)[1].lower()
 
-    if file_extension not in ["txt", "pdf", "jpg", "png", "jpeg", "json", "csv"]:
+    if file_extension not in [".txt", ".pdf", ".jpg", ".png", ".jpeg", ".json", ".csv"]:
         raise InvalidFileTypeError(f"File type '{file_extension}' is not allowed.")
 
     filePath = os.path.join(uploadDirectory, filename)
