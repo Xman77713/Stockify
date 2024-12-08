@@ -2,11 +2,12 @@ import os
 
 import mysql.connector
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, UploadFile, HTTPException, Form
 from src.models.deleteFile import deleteFileByName, deleteFileById
 from src.models.readFile import readListeFile, readFileByName, readFileById
 from src.models.uploadFile import uploadFile
 from src.models.downloadFile import downloadFileByName, downloadFileById
+from starlette.requests import Request
 
 load_dotenv()
 
@@ -27,13 +28,16 @@ try:
 
         app = FastAPI()
         uploadDirectory = "src/models/uploadDirectory"
+        uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
 
         if not os.path.exists(uploadDirectory):
             os.makedirs(uploadDirectory)
 
+        if not os.path.exists(uploadDirectoryTemp):
+            os.makedirs(uploadDirectoryTemp)
 
         @app.post("/uploadfile/")
-        async def uploadFileAPI(file: UploadFile = File(...)):
+        async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Request = None):
             """
             Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
             """
