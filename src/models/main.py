@@ -25,7 +25,7 @@ async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Re
     Endpoint POST to upload a file. The encrypted file is saved in Stockify/src/models/uploadDirectory
     """
     try:
-        return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, request)}
+        return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, password, request)}
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
 
