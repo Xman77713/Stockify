@@ -3,7 +3,7 @@ import os
 from src.models.exception import InvalidFileTypeError
 
 
-async def uploadFile(file, uploadDirectory, conn, cursor):
+async def uploadFile(file, password, uploadDirectory, uploadDirectoryTemp, conn, cursor, request):
     filename = file.filename
     file_extension = filename.split('.')[1].lower()
 

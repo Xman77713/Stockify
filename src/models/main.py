@@ -42,7 +42,7 @@ try:
             Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
             """
             try:
-                return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, conn, cursor)}
+                return {"Info": "Success", "Function Result": await uploadFile(file, password, uploadDirectory, uploadDirectoryTemp, conn, cursor, request)}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
