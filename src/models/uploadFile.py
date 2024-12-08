@@ -5,13 +5,11 @@ from src.models.crypto import createKey, encryptFile, encryptChar
 
 
 async def uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, request):
-    extension = [".txt", ".pdf", ".jpg", ".png", ".jpeg", ".json", ".csv"]
-    file_extension = os.path.splitext(file.filename)[1].lower()
-
-    if file_extension not in extension:
-        raise InvalidFileTypeError(f"File type '{file_extension}' is not allowed.")
-
     filename = file.filename
+    file_extension = os.path.splitext(filename)[1].lower()
+
+    if file_extension not in [".txt", ".pdf", ".jpg", ".png", ".jpeg", ".json", ".csv"]:
+        raise InvalidFileTypeError(f"File type '{file_extension}' is not allowed.")
 
     key = createKey(password)
     encryptFilename = encryptChar(filename.encode("utf-8"), key)
