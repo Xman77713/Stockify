@@ -2,11 +2,10 @@ import os
 
 import mysql.connector
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, HTTPException, Form
-from src.models.deleteFile import deleteFileByName, deleteFileById
-from src.models.readFile import readListeFile, readFileByName, readFileById
+from fastapi import FastAPI, UploadFile, HTTPException, Form, BackgroundTasks
+from src.models.deleteFile import deleteFileById
+from src.models.readFile import readListeFile, downloadFileByName
 from src.models.uploadFile import uploadFile
-from src.models.downloadFile import downloadFileByName, downloadFileById
 from starlette.requests import Request
 
 load_dotenv()
@@ -27,11 +26,7 @@ try:
         cursor.execute("USE stockifyDB")
 
         app = FastAPI()
-        uploadDirectory = "src/models/uploadDirectory"
         uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
-
-        if not os.path.exists(uploadDirectory):
-            os.makedirs(uploadDirectory)
 
         if not os.path.exists(uploadDirectoryTemp):
             os.makedirs(uploadDirectoryTemp)
@@ -42,23 +37,9 @@ try:
             Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
             """
             try:
-                return {"Info": "Success", "Function Result": await uploadFile(file, password, uploadDirectory, uploadDirectoryTemp, conn, cursor, request)}
+                return {"Info": "Success", "Function Result": await uploadFile(file, password, conn, cursor, request)}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
-
-
-        @app.delete("/deletefilename/")
-        def deleteFileByNameAPI(filename: str):
-            """
-            Endpoint to delete a file by name
-            """
-            try:
-                return {"Info": "Success", "Function Result": deleteFileByName(filename, conn, cursor)}
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-            except Exception as e:
-                return {"Info": "Fail", "Error": str(e)}
-
 
         @app.delete("/deletefileid/")
         def deleteFileByIdAPI(id: int):
@@ -72,7 +53,6 @@ try:
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
-
         @app.get("/files/")
         def listFilesAPI():
             """
@@ -85,53 +65,26 @@ try:
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
-
-        @app.get("/filename/")
-        def readFileByNameAPI(filename: str):
+        @app.post("/downloadfilelink/")
+        def downloadFileByLink(password: str = Form(...), filename: str = "", bgTask: BackgroundTasks = None):
             """
-            Endpoint to get a file by name
+            Endpoint POST to download a file
             """
             try:
-                return {"Info": "Success", "Function Result": readFileByName(filename, cursor)}
+                return downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
-
-        @app.get("/fileid/")
-        def readFileByIdAPI(id: int):
+        @app.get("/downloadfilelink/{filename}")
+        def page(request: Request, filename: str):  #nom à changer TODO
             """
-            Endpoint to get a file by name
-            """
-            try:
-                return {"Info": "Success", "Function Result": readFileById(id, cursor)}
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-            except Exception as e:
-                return {"Info": "Fail", "Error": str(e)}
-
-
-        @app.get("/downloadfilename/")
-        def downloadFileByNameAPI(filename: str):
-            """
-            Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
+            Endpoint GET to get a HTML page before downloading the asked file
             """
             try:
-                return downloadFileByName(filename, cursor)
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-            except Exception as e:
-                return {"Info": "Fail", "Error": str(e)}
-
-
-        @app.get("/downloadfileid/")
-        def downloadFileByIdAPI(id: int):
-            """
-            Endpoint pour télécharger un fichier spécifique depuis uploadDirectory.
-            """
-            try:
-                return downloadFileById(id, cursor)
+                return None #page qui demande mdp, récupère le filePath de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et filePath) TODO
+                #return templates.TemplateResponse("index.html", {"request": request})
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
@@ -142,4 +95,4 @@ try:
         # conn.close()
 
 except Exception as e:
-    print(f"Erreur lors de la connexion à la base de données : {e}")
+    print(f"Error when connecting to the DB : {e}")

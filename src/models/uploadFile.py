@@ -1,21 +1,17 @@
-import os
+from src.models.crypto import createKey, encryptChar, encryptFile
 
-from src.models.exception import InvalidFileTypeError
-
-
-async def uploadFile(file, password, uploadDirectory, uploadDirectoryTemp, conn, cursor, request):
+async def uploadFile(file, password, conn, cursor, request):
     filename = file.filename
-    file_extension = os.path.splitext(filename)[1].lower()
+    fileData = await file.read()
 
-    if file_extension not in [".txt", ".pdf", ".jpg", ".png", ".jpeg", ".json", ".csv"]:
-        raise InvalidFileTypeError(f"File type '{file_extension}' is not allowed.")
+    key = createKey(password)
+    encryptFilename = encryptChar(filename.encode("utf-8"), key)
 
-    filePath = os.path.join(uploadDirectory, filename)
+    result = encryptFile(fileData, key)
 
-    with open(filePath, "wb") as directory:
-        directory.write(await file.read())
+    downloadLink = f"{request.base_url}downloadfilelink/{encryptFilename}"
 
-    cursor.execute("INSERT INTO file (path, name, extension) VALUES (%s, %s, %s)", (filePath, filename, file_extension))
+    cursor.execute("INSERT INTO file (name, iv, data) VALUES (%s, %s, %s)", (encryptFilename, result[0], result[1]))
     conn.commit()
 
-    return {"filename": filename, "message": "File successfully saved"}
+    return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}

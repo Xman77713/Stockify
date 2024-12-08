@@ -1,8 +1,6 @@
-class InvalidFileTypeError(Exception):
-    """
-    Exception raised in case of non-authorized extension
-    """
+class WrongPasswordError(Exception):
+    """Exception raised for Wrong password"""
 
-    def __init__(self, message="Invalid file type."):
+    def __init__(self, message="Wrong password."):
         self.message = message
         super().__init__(self.message)
