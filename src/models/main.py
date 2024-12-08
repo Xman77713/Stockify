@@ -34,7 +34,7 @@ try:
         @app.post("/uploadfile/")
         async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Request = None):
             """
-            Endpoint to upload a file. The file is saved in Stockify/src/models/uploadDirectory
+            Endpoint to upload a file. The file is saved in the DB
             """
             try:
                 return {"Info": "Success", "Function Result": await uploadFile(file, password, conn, cursor, request)}
@@ -56,7 +56,7 @@ try:
         @app.delete("/deletefiles/")
         def deleteFilesAPI():
             """
-            Endpoint to delete a file by name. For developer
+            Endpoint to delete files in DB. For developer
             """
             try:
                 return {"Info": "Success", "Function Result": deleteFiles(cursor, conn)}
