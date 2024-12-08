@@ -33,7 +33,7 @@ async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Re
 @app.delete("/deletefile/")
 def deleteFilesAPI():
     """
-    Endpoint DELETE to delete a file by name. For developer
+    Endpoint DELETE to delete files in uploadDirectory. For developer
     """
     try:
         return {"Info": "Success", "Function Result": deleteFiles(uploadDirectory)}
