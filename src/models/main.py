@@ -3,7 +3,7 @@ import os
 import mysql.connector
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, HTTPException, Form, BackgroundTasks
-from src.models.deleteFile import deleteFileById
+from src.models.deleteFile import deleteFileById, deleteFiles
 from src.models.readFile import readListeFile, downloadFileByName
 from src.models.uploadFile import uploadFile
 from starlette.requests import Request
@@ -44,7 +44,7 @@ try:
         @app.delete("/deletefileid/")
         def deleteFileByIdAPI(id: int):
             """
-            Endpoint to delete a file by name
+            Endpoint to delete a file by name. For developer
             """
             try:
                 return {"Info": "Success", "Function Result": deleteFileById(id, conn, cursor)}
@@ -53,10 +53,22 @@ try:
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
+        @app.delete("/deletefiles/")
+        def deleteFilesAPI():
+            """
+            Endpoint to delete a file by name. For developer
+            """
+            try:
+                return {"Info": "Success", "Function Result": deleteFiles(cursor, conn)}
+            except FileNotFoundError:
+                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
+            except Exception as e:
+                return {"Info": "Fail", "Error": str(e)}
+
         @app.get("/files/")
         def listFilesAPI():
             """
-            Endpoint to get the list of available file's names in src/models/uploadDirectory
+            Endpoint to get the list of available file's names in DB. For developer
             """
             try:
                 return {"Info": "Success", "Function Result": readListeFile(cursor)}

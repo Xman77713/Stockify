@@ -10,6 +10,11 @@ def deleteFileById(id, conn, cursor):
 
     return {"filename": f"File with id={id} is removed", "message": "File successfully deleted"}
 
+def deleteFiles(cursor, conn):
+    cursor.execute("DELETE FROM file")
+    conn.commit()
+    return {"message": "uploadDirectory successfully cleared"}
+
 def deleteFileByPath(filePath):
     filePath = filePath.replace('\\','/')
     os.remove(filePath)
