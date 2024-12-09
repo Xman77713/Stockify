@@ -32,12 +32,12 @@ try:
             os.makedirs(uploadDirectoryTemp)
 
         @app.post("/uploadfile/")
-        async def uploadFileAPI(file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None):
+        async def uploadFileAPI(file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...)):
             """
             Endpoint to upload a file. The file is saved in the DB
             """
             try:
-                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request)}
+                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, str(os.getenv('mailAPIKey')))}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
