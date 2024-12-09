@@ -30,6 +30,12 @@ templates = Jinja2Templates(directory="src/views")
 async def read_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/downloadfilelink/{filePath}", response_class=HTMLResponse)
+async def downloadPage(request: Request):
+    """
+    Endpoint GET to get a HTML page before downloading the asked file
+    """
+    return templates.TemplateResponse("download.html", {"request": request})
 
 @app.post("/uploadfile/")
 async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Request = None):
@@ -66,25 +72,12 @@ def listFilesAPI():
         return {"Info": "Fail", "Error": str(e)}
 
 @app.post("/downloadfilelink/")
-def downloadFileByLink(password: str = Form(...), filePath: str = "", bgTask: BackgroundTasks = None):
+def downloadFileByLink(password: str = Form(...), filePath: str = Form(...), bgTask: BackgroundTasks = None):
     """
     Endpoint POST to download a file
     """
     try:
         return downloadFileByFilePath(filePath, uploadDirectoryTemp, password, bgTask)
-    except FileNotFoundError:
-        return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-    except Exception as e:
-        return {"Info": "Fail", "Error": str(e)}
-
-@app.get("/downloadfilelink/{filePath}")
-def page(request: Request, filePath: str):  #nom à changer TODO
-    """
-    Endpoint GET to get a HTML page before downloading the asked file
-    """
-    try:
-        return None #page qui demande mdp, récupère le filePath de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et filePath) TODO
-        #return templates.TemplateResponse("index.html", {"request": request})
     except FileNotFoundError:
         return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
     except Exception as e:

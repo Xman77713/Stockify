@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Stockify</title>
-    <link rel="stylesheet" href="static/design.css">
+    <link rel="stylesheet" href="/static/design.css">
 </head>
 <body>
     <h1>Bienvenue sur Stockify</h1>
@@ -11,7 +11,7 @@
     <form id="formForUpload">
         <input type="file" id="fileInput" name="file">
         <input type="password" id="mdp" name="pass" placeholder="Entrez votre mot de passe" required>
-        <button type="button" id="uploadButton">Téléchargement</button>
+        <button type="button" id="uploadButton">Upload</button>
     </form>
     <div id="result"></div>
 
@@ -42,10 +42,8 @@
 
                 const result = await response.json();
                 if(response.ok) {
-                    console.log(result);
                     const downloadLink = result["Function Result"]["download link"];
                     document.getElementById("result").innerHTML = `Réussite : <a href="${downloadLink}" target="_blank">Télécharger le fichier</a>`;
-                    // Todo, mettre en place le lien de download, utiliser la page download.css si possible
                 } else {
                     document.getElementById("result").innerText = `Échec : ${result.Info}`;
                 }

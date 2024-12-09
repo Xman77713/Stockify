@@ -4,14 +4,63 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Pour dl un fichier (j'espère)</title>
-        <link rel="stylesheet" href="static/design_dl.css">
+        <link rel="stylesheet" href="/static/design_dl.css">
     </head>
     <body>
         <h1>Téléchargement de votre fichier</h1>
-        <form action="/validate-download/" method="POST">
-            <input type="hidden" name="filename" value="{filename}">
-            <input type="password" name="password" placeholder="Entrez le mot de passe" required>
-            <button type="submit">Télécharger</button>
+        <form id="downloadForm">
+            <input type="password" name="password" placeholder="Entrez le mot de passe" id="mdp" required>
+            <button type="button" id="downloadButton">Télécharger</button>
         </form>
+        <div id="dlResponse" class="message"></div>
+        <script>
+            document.getElementById("downloadButton").addEventListener("click", async () => {
+                const formData = new FormData();
+                const passwordInput = document.getElementById("mdp");
+                const filePath = window.location.href.split('/downloadfilelink/', 2)[1].split('/', 1)[0];
+
+                if(!passwordInput.value) {
+                    document.getElementById("path").innerText = "Veuillez entrer un mot de passe.";
+                    return;
+                }
+
+                formData.append("password", passwordInput.value);
+                formData.append("filePath", filePath);
+
+                try {
+                    const response = await fetch("/downloadfilelink/", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if(response.ok && response.headers.get('Content-Type') === 'application/octet-stream') {
+                        const header = response.headers.get('Content-Disposition');
+                        const filename = header.split(';')[1].split('=')[1].slice(1,-1);
+
+                        const blob = await response.blob();
+                        const newBlob = new Blob([blob]);
+                        const blobUrl = window.URL.createObjectURL(newBlob);
+
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.setAttribute('download', `${filename}`);
+                        document.body.appendChild(link);
+                        link.click();
+                        link.parentNode.removeChild(link);
+
+                        // clean up Url
+                        window.URL.revokeObjectURL(blobUrl);
+                        passwordInput.value = '';
+                        document.getElementById("dlResponse").innerText = `Fichier téléchargé`;
+                    } else {
+                        const responseData = await response.json();
+                        document.getElementById("dlResponse").innerText = `${responseData.Info} (${responseData.Error})`;
+                    }
+                } catch (err) {
+                    console.log(err)
+                    document.getElementById("dlResponse").innerText = `Erreur`;
+                }
+            });
+        </script>
     </body>
     </html>
