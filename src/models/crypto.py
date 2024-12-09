@@ -6,12 +6,9 @@ from Crypto.Util.Padding import pad, unpad
 def createKey(password):
     return hashlib.sha256(password.encode()).digest()
 
-def encryptFile(filePath, key):
-    with open(filePath, "rb") as file:
-        data = file.read()
-
+def encryptFile(fileData, key):
     cipher = AES.new(key, AES.MODE_CBC)
-    cipher_data = cipher.encrypt(pad(data, AES.block_size))
+    cipher_data = cipher.encrypt(pad(fileData, AES.block_size))
 
     return cipher.iv, cipher_data
 

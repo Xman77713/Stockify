@@ -37,7 +37,7 @@ async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Re
     Endpoint POST to upload a file. The encrypted file is saved in Stockify/src/models/uploadDirectory
     """
     try:
-        return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, uploadDirectoryTemp, password, request)}
+        return {"Info": "Success", "Function Result": await uploadFile(file, uploadDirectory, password, request)}
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
 
@@ -45,7 +45,7 @@ async def uploadFileAPI(file: UploadFile, password: str = Form(...), request: Re
 @app.delete("/deletefile/")
 def deleteFilesAPI():
     """
-    Endpoint DELETE to delete a file by name. For developer
+    Endpoint DELETE to delete files in uploadDirectory. For developer
     """
     try:
         return {"Info": "Success", "Function Result": deleteFiles(uploadDirectory)}
