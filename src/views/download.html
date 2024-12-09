@@ -8,13 +8,13 @@
     </head>
     <body>
         <h1>Téléchargement de votre fichier</h1>
-        <form id="downloadForm">
-            <input type="password" name="password" placeholder="Entrez le mot de passe" id="mdp" required>
+        <div id="downloadForm">
+            <input type="password" name="password" placeholder="Entrez le mot de passe" id="mdp">
             <button type="button" id="downloadButton">Télécharger</button>
-        </form>
+        </div>
         <div id="dlResponse" class="message"></div>
         <script>
-            document.getElementById("downloadButton").addEventListener("click", async () => {
+            async function downloadFile() {
                 const formData = new FormData();
                 const passwordInput = document.getElementById("mdp");
                 const filePath = window.location.href.split('/downloadfilelink/', 2)[1].split('/', 1)[0];
@@ -59,6 +59,14 @@
                     console.log(err)
                     document.getElementById("dlResponse").innerText = `Erreur`;
                 }
+            }
+            document.getElementById("mdp").addEventListener("keydown", async (e) => {
+                if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+                    await downloadFile();
+                }
+            });
+            document.getElementById("downloadButton").addEventListener("click", async () => {
+                await downloadFile();
             });
         </script>
     </body>
