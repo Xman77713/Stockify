@@ -48,7 +48,6 @@
                         link.click();
                         link.parentNode.removeChild(link);
 
-                        // clean up Url
                         window.URL.revokeObjectURL(blobUrl);
                         passwordInput.value = '';
                         document.getElementById("dlResponse").innerText = `Fichier téléchargé`;
