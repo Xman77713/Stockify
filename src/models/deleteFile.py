@@ -18,3 +18,7 @@ def deleteFiles(cursor, conn):
 def deleteFileByPath(filePath):
     filePath = filePath.replace('\\','/')
     os.remove(filePath)
+
+def deleteFileFromDB(filename, cursor, conn):
+    cursor.execute("DELETE FROM file WHERE name=(%s)", (filename,))
+    conn.commit()

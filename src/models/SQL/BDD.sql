@@ -5,9 +5,10 @@ USE stockifyDB;
 
 CREATE TABLE file (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    iv BLOB,
-    data LONGBLOB
+    name VARCHAR(255) NOT NULL,
+    iv BLOB NOT NULL,
+    data LONGBLOB NOT NULL,
+    uniqueLink boolean NOT NULL
 );
 
 -- pour lancer le script

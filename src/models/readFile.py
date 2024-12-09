@@ -4,19 +4,19 @@ from fastapi.responses import FileResponse
 
 from src.models.crypto import createKey, decryptChar, decryptFile
 from src.models.exception import WrongPasswordError
-from src.models.deleteFile import deleteFileByPath
+from src.models.deleteFile import deleteFileByPath, deleteFileFromDB
 
 
 def readListeFile(cursor):
-    cursor.execute("SELECT name FROM file")
+    cursor.execute("SELECT id, name FROM file")
     try:
-        return [name[0] for name in cursor.fetchall()]
+        return [(line[0],line[1]) for line in cursor.fetchall()]
     except:
-        return []
+        return None
 
 
-def downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor):
-    cursor.execute("SELECT iv, data FROM file WHERE name=(%s)",(filename,))
+def downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor, conn):
+    cursor.execute("SELECT iv, data, uniqueLink FROM file WHERE name=(%s)",(filename,))
     queryResult = cursor.fetchall()
 
     if not queryResult:
@@ -24,6 +24,7 @@ def downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor):
 
     iv = queryResult[0][0]
     encryptedFileData = queryResult[0][1]
+    uniqueLink = queryResult[0][2]
 
     key = createKey(password)
 
@@ -39,5 +40,7 @@ def downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor):
         directory.write(result)
 
     bgTask.add_task(deleteFileByPath, filePathTemp)
+    if uniqueLink:
+        bgTask.add_task(deleteFileFromDB, filename, cursor, conn)
 
     return FileResponse(str(filePathTemp), media_type="application/octet-stream", filename=decryptedFilename)
