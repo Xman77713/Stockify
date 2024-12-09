@@ -42,13 +42,15 @@
 
                 const result = await response.json();
                 if(response.ok) {
-                    const downloadLink = result["download link"];
+                    console.log(result);
+                    const downloadLink = result["Function Result"]["download link"];
                     document.getElementById("result").innerHTML = `Réussite : <a href="${downloadLink}" target="_blank">Télécharger le fichier</a>`;
                     // Todo, mettre en place le lien de download, utiliser la page download.css si possible
                 } else {
                     document.getElementById("result").innerText = `Échec : ${result.Info}`;
                 }
             } catch (err) {
+                console.log(err)
                 document.getElementById("result").innerText = `Erreur`;
             }
         });
