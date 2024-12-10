@@ -8,7 +8,10 @@ CREATE TABLE file (
     name VARCHAR(255) NOT NULL,
     iv BLOB NOT NULL,
     data LONGBLOB NOT NULL,
-    uniqueLink boolean NOT NULL
+    uniqueLink boolean NOT NULL,
+    expirationDate DATETIME NOT NULL,
+    salt TEXT NOT NULL,
+    token TEXT NOT NULL
 );
 
 -- pour lancer le script
