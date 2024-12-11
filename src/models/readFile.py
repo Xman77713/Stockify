@@ -1,3 +1,4 @@
+import base64
 import os
 
 from fastapi.responses import FileResponse
@@ -15,21 +16,25 @@ def readListeFile(cursor):
         return None
 
 
-def downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor, conn):
-    cursor.execute("SELECT iv, data, uniqueLink FROM file WHERE name=(%s)",(filename,))
+def downloadFileByName(token, uploadDirectoryTemp, password, bgTask, cursor, conn):
+    cursor.execute("SELECT name, iv, data, uniqueLink, salt FROM file WHERE token=(%s)",(token,))
     queryResult = cursor.fetchall()
 
     if not queryResult:
         raise FileNotFoundError
 
-    iv = queryResult[0][0]
-    encryptedFileData = queryResult[0][1]
-    uniqueLink = queryResult[0][2]
+    filename = queryResult[0][0]
+    iv = queryResult[0][1]
+    encryptedFileData = queryResult[0][2]
+    uniqueLink = queryResult[0][3]
 
-    key = createKey(password)
+    salt = base64.urlsafe_b64encode(bytes(queryResult[0][4])).decode('utf-8')
+    #TODO erreur salt
+    key = createKey(password, salt)
 
     try: decryptedFilename = decryptChar(filename, key)
     except : raise WrongPasswordError
+
     filePathTemp = os.path.join(uploadDirectoryTemp, decryptedFilename)
 
     result = decryptFile(encryptedFileData, key, iv)

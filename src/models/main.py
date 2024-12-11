@@ -6,6 +6,7 @@ from fastapi import FastAPI, UploadFile, HTTPException, Form, BackgroundTasks
 from src.models.deleteFile import deleteFileById, deleteFiles
 from src.models.readFile import readListeFile, downloadFileByName
 from src.models.uploadFile import uploadFile
+from src.models.deleteFile import deleteExpiredFile
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
@@ -50,12 +51,13 @@ try:
             return templates.TemplateResponse("download.html", {"request": request})
 
         @app.post("/uploadfile/")
-        async def uploadFileAPI(file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...)):
+        async def uploadFileAPI(file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)):
             """
             Endpoint to upload a file. The file is saved in the DB
             """
             try:
-                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, str(os.getenv('mailAPIKey')))}
+                deleteExpiredFile(cursor, conn)
+                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, str(os.getenv('mailAPIKey')), expirationTimeHours)}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
@@ -96,24 +98,25 @@ try:
                 return {"Info": "Fail", "Error": str(e)}
 
         @app.post("/downloadfilelink/")
-        def downloadFileByLink(password: str = Form(...), filename: str = "", bgTask: BackgroundTasks = None):
+        def downloadFileByLink(password: str = Form(...), token: str = "", bgTask: BackgroundTasks = None):
             """
             Endpoint POST to download a file
             """
             try:
-                return downloadFileByName(filename, uploadDirectoryTemp, password, bgTask, cursor, conn)
+                deleteExpiredFile(cursor, conn)
+                return downloadFileByName(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
-        @app.get("/downloadfilelink/{filename}")
-        def page(request: Request, filename: str):  #nom à changer TODO
+        @app.get("/downloadfilelink/{token}")
+        def page(request: Request, token: str):  #nom à changer TODO
             """
             Endpoint GET to get a HTML page before downloading the asked file
             """
             try:
-                return None #page qui demande mdp, récupère le filePath de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et filePath) TODO
+                return None #page qui demande mdp, récupère le token de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et token) TODO
                 #return templates.TemplateResponse("index.html", {"request": request})
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}

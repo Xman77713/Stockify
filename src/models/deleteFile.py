@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 
 def deleteFileById(id, conn, cursor):
     cursor.execute("SELECT (id) FROM file WHERE id = (%s)", (id,))
@@ -21,4 +23,8 @@ def deleteFileByPath(filePath):
 
 def deleteFileFromDB(filename, cursor, conn):
     cursor.execute("DELETE FROM file WHERE name=(%s)", (filename,))
+    conn.commit()
+
+def deleteExpiredFile(cursor, conn):
+    cursor.execute("DELETE FROM file WHERE expirationDate<(%s)", (datetime.now(),))
     conn.commit()
