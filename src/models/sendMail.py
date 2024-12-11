@@ -4,6 +4,9 @@ from email.mime.text import MIMEText
 
 import requests
 
+from src.models.exception import mailNotReached
+
+
 def sendMail1(mailReceiver, downloadLink, apiKey, uniqueLink, expirationDate, filename):
     expirationDate = expirationDate.strftime("%d/%m/%Y à %H:%M:%S")
 
@@ -46,4 +49,4 @@ def sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate
         server.sendmail(emailfrom, mailReceiver, msg.as_string())
         server.quit()
     except Exception as e:
-        print(e)
+        raise mailNotReached
