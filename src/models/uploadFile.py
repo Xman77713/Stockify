@@ -6,7 +6,7 @@ from src.models.sendMail import sendMail
 from src.models.exception import IncorrectTimeError, IncorrectMailError
 
 
-async def uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, mailAPIKey, expirationTimeHours):
+async def uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, mdpPassword, expirationTimeHours):
     salt = os.urandom(16)
 
     try:
@@ -32,7 +32,7 @@ async def uploadFile(file, uniqueLink, password, conn, cursor, request, mailRece
 
     downloadLink = f"{request.base_url}downloadfilelink/{token}"
 
-    sendMail(mailReceiver, downloadLink, mailAPIKey, uniqueLink, expirationDate, filename)
+    sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate, filename)
 
     cursor.execute("INSERT INTO file (name, iv, data, uniqueLink, expirationDate, salt, token) VALUES (%s,%s,%s,%s,%s,%s,%s)", (encryptFilename, result[0], result[1], uniqueLink, expirationDate, salt, str(token)))
     conn.commit()

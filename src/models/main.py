@@ -57,7 +57,7 @@ try:
             """
             try:
                 deleteExpiredFile(cursor, conn)
-                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, str(os.getenv('mailAPIKey')), expirationTimeHours)}
+                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, str(os.getenv('appPassword')), expirationTimeHours)}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
