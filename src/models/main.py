@@ -7,6 +7,9 @@ from src.models.deleteFile import deleteFileById, deleteFiles
 from src.models.readFile import readListeFile, downloadFileByName
 from src.models.uploadFile import uploadFile
 from starlette.requests import Request
+from starlette.responses import HTMLResponse
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 load_dotenv()
 
@@ -30,6 +33,21 @@ try:
 
         if not os.path.exists(uploadDirectoryTemp):
             os.makedirs(uploadDirectoryTemp)
+
+        app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+        templates = Jinja2Templates(directory="src/views")
+
+        @app.get("/", response_class=HTMLResponse)
+        async def read_index(request: Request):
+            return templates.TemplateResponse("index.html", {"request": request})
+
+        @app.get("/downloadfilelink/{filePath}", response_class=HTMLResponse)
+        async def downloadPage(request: Request):
+            """
+            Endpoint GET to get a HTML page before downloading the asked file
+            """
+            return templates.TemplateResponse("download.html", {"request": request})
 
         @app.post("/uploadfile/")
         async def uploadFileAPI(file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...)):
