@@ -43,7 +43,7 @@ try:
         async def read_index(request: Request):
             return templates.TemplateResponse("index.html", {"request": request})
 
-        @app.get("/downloadfilelink/{filePath}", response_class=HTMLResponse)
+        @app.get("/downloadfilelink/{token}", response_class=HTMLResponse)
         async def downloadPage(request: Request):
             """
             Endpoint GET to get a HTML page before downloading the asked file
@@ -105,19 +105,6 @@ try:
             try:
                 deleteExpiredFile(cursor, conn)
                 return downloadFileByName(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
-            except Exception as e:
-                return {"Info": "Fail", "Error": str(e)}
-
-        @app.get("/downloadfilelink/{token}")
-        def page(request: Request, token: str):  #nom à changer TODO
-            """
-            Endpoint GET to get a HTML page before downloading the asked file
-            """
-            try:
-                return None #page qui demande mdp, récupère le token de la requête et appelle le endpoint de post pour download le file (en envoyant mdp et token) TODO
-                #return templates.TemplateResponse("index.html", {"request": request})
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
