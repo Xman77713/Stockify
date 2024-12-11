@@ -2,9 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Stockify</title>
+    <link rel="stylesheet" href="/static/design.css">
 </head>
 <body>
+    <h1>Bienvenue sur Stockify</h1>
+    <h2>Vous pouvez stocker tous vos fichiers important</h2>
+    <div id="formForUpload">
+        <input type="file" id="fileInput" name="file">
+        <input type="password" id="mdp" name="pass" placeholder="Entrez votre mot de passe">
+        <button type="button" id="uploadButton">Upload</button>
+    </div>
+    <div id="result"></div>
 
+    <script>
+        function copyLink() {
+            const link = document.getElementById("fileLink");
+            navigator.clipboard.writeText(link.href);
+            const tooltip = document.getElementById("copyTooltip");
+            tooltip.innerHTML = "Lien copié";
+        }
+
+        function outFunc() {
+            const tooltip = document.getElementById("copyTooltip");
+            tooltip.innerHTML = "Lien de téléchargement du fichier";
+        }
+
+        async function uploadFile() {
+            const formData = new FormData();
+            const fileInput = document.getElementById("fileInput");
+            const passwordInput = document.getElementById("mdp");
+
+            if(!fileInput.files[0]) {
+                document.getElementById("result").innerText = "Aucun fichier selectionné.";
+                return;
+            }
+
+            if(!passwordInput.value) {
+                document.getElementById("result").innerText = "Veuillez entrer un mot de passe.";
+                return;
+            }
+
+            formData.append("file", fileInput.files[0]);
+            formData.append("password", passwordInput.value);
+
+            try {
+                const response = await fetch("/uploadfile/", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if(response.ok) {
+                    const downloadLink = result["Function Result"]["download link"];
+                    document.getElementById("result").innerHTML = `
+                        <div>Réussite : <a id="fileLink" href="${downloadLink}" target="_blank">Télécharger le fichier</a></div>
+                        <div class="tooltip">
+                            <button onclick="copyLink()" onmouseout="outFunc()" id="copyLink">
+                              <span class="tooltiptext" id="copyTooltip">Lien de téléchargement du fichier</span>
+                              Copier le lien
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById("result").innerText = `Échec : ${result.Info}`;
+                }
+            } catch (err) {
+                console.log(err)
+                document.getElementById("result").innerText = `Erreur`;
+            }
+        }
+        document.getElementById("mdp").addEventListener("keydown", async (e) => {
+            if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+                await uploadFile();
+            }
+        });
+        document.getElementById("uploadButton").addEventListener("click", async () => {
+            await uploadFile();
+        });
+    </script>
 </body>
 </html>
