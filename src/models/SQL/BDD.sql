@@ -10,7 +10,7 @@ CREATE TABLE file (
     data LONGBLOB NOT NULL,
     uniqueLink boolean NOT NULL,
     expirationDate DATETIME NOT NULL,
-    salt TEXT NOT NULL,
+    salt BLOB NOT NULL,
     token TEXT NOT NULL
 );
 

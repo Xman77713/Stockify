@@ -26,16 +26,15 @@ async def uploadFile(file, uniqueLink, password, conn, cursor, request, mailRece
 
     encryptFilename = encryptChar(filename.encode("utf-8"), key)
 
-    expiration_date = datetime.now() + timedelta(hours=float(expirationTimeHours))
+    expirationDate = datetime.now() + timedelta(hours=float(expirationTimeHours))
 
     result = encryptFile(fileData, key)
 
     downloadLink = f"{request.base_url}downloadfilelink/{token}"
 
-    sendMail(mailReceiver, downloadLink, mailAPIKey)
-    print(type(salt))
-    print(type(token))
-    cursor.execute("INSERT INTO file (name, iv, data, uniqueLink, expirationDate, salt, token) VALUES (%s,%s,%s,%s,%s,%s,%s)", (encryptFilename, result[0], result[1], uniqueLink, expiration_date, str(salt), str(token)))
+    sendMail(mailReceiver, downloadLink, mailAPIKey, uniqueLink, expirationDate, filename)
+
+    cursor.execute("INSERT INTO file (name, iv, data, uniqueLink, expirationDate, salt, token) VALUES (%s,%s,%s,%s,%s,%s,%s)", (encryptFilename, result[0], result[1], uniqueLink, expirationDate, salt, str(token)))
     conn.commit()
 
     return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}

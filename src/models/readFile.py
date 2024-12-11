@@ -1,4 +1,3 @@
-import base64
 import os
 
 from fastapi.responses import FileResponse
@@ -28,8 +27,8 @@ def downloadFileByName(token, uploadDirectoryTemp, password, bgTask, cursor, con
     encryptedFileData = queryResult[0][2]
     uniqueLink = queryResult[0][3]
 
-    salt = base64.urlsafe_b64encode(bytes(queryResult[0][4])).decode('utf-8')
-    #TODO erreur salt
+    salt = queryResult[0][4]
+
     key = createKey(password, salt)
 
     try: decryptedFilename = decryptChar(filename, key)
