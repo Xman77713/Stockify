@@ -28,7 +28,7 @@ def sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate
         separator = "-----------------------------------------------------------------"
         message = f"Hello,\nVoici un lien pour télécharger {filename} :\n{separator}\n{downloadLink}\n{separator}\n"
         if uniqueLink:
-            message += "Attention ce fichier ne peut être télécharger qu'une seule fois !"
+            message += "Attention ce fichier ne peut être téléchargé qu'une seule fois !"
         message += f"\nExpire le {expirationDate}\n\nBon/Bonne [insérer le moment de la journée]\nLa team Stockify"
 
         emailfrom = "stockifyesiea@gmail.com"
