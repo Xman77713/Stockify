@@ -110,7 +110,6 @@ try:
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
-        # print("co fermée")
         # cursor.close()
         # conn.close()
 
