@@ -13,8 +13,3 @@ CREATE TABLE file (
     salt BLOB NOT NULL,
     token TEXT NOT NULL
 );
-
--- pour lancer le script
--- mysql -h stockifydb-stockifydb1.f.aivencloud.com -P 17500 -u avnadmin -p --ssl-mode=REQUIRED
--- password
--- source C:/projet_crypto/Stockify/src/models/SQL/BDD.sql;
