@@ -1,10 +1,12 @@
 import base64
 import hashlib
+import secrets
+
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
-def createKey(password):
-    return hashlib.sha256(password.encode()).digest()
+def createKey(password, salt):
+    return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
 
 def encryptFile(fileData, key):
     cipher = AES.new(key, AES.MODE_CBC)
@@ -30,3 +32,6 @@ def decryptChar(char, key):
     decrypted = unpad(cipher.decrypt(cipher_data), AES.block_size)
 
     return decrypted.decode('utf-8')
+
+def createToken():
+    return base64.urlsafe_b64encode(secrets.token_bytes(16)).decode('utf-8')
