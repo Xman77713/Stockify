@@ -98,7 +98,7 @@ try:
                 return {"Info": "Fail", "Error": str(e)}
 
         @app.post("/downloadfilelink/")
-        def downloadFileByLink(password: str = Form(...), token: str = "", bgTask: BackgroundTasks = None):
+        def downloadFileByLink(password: str = Form(...), token: str = Form(...), bgTask: BackgroundTasks = None):
             """
             Endpoint POST to download a file
             """

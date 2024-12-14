@@ -25,7 +25,7 @@
                 }
 
                 formData.append("password", passwordInput.value);
-                formData.append("filePath", filePath);
+                formData.append("token", filePath);
 
                 try {
                     const response = await fetch("/downloadfilelink/", {
