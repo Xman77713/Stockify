@@ -35,7 +35,6 @@
 
                     if(response.ok && response.headers.get('Content-Type') === 'application/octet-stream') {
                         const contentDispositionHeader = response.headers.get('Content-Disposition');
-                        //const filename = contentDispositionHeader.split('filename')[1].split('"')[1]
                         const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-\.]+)(?:; ?|$)/i;
                         const asciiFilenameRegex = /^filename=(["']?)(.*?[^\\])\1(?:; ?|$)/i;
 
