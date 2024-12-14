@@ -51,7 +51,7 @@ try:
             return templates.TemplateResponse("download.html", {"request": request})
 
         @app.post("/uploadfile/")
-        async def uploadFileAPI(file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)):
+        async def uploadFileAPI(file: UploadFile, uniqueLink: bool = Form(...), password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)):
             """
             Endpoint to upload a file. The file is saved in the DB
             """

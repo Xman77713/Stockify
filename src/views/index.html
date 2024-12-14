@@ -4,18 +4,56 @@
     <meta charset="UTF-8">
     <title>Stockify</title>
     <link rel="stylesheet" href="/static/design.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <h1>Bienvenue sur Stockify</h1>
     <h2>Vous pouvez stocker tous vos fichiers important</h2>
     <div id="formForUpload">
-        <input type="file" id="fileInput" name="file">
-        <input type="password" id="mdp" name="pass" placeholder="Entrez votre mot de passe">
-        <button type="button" id="uploadButton">Upload</button>
+        <input type="file" id="fileInput" name="file" oninput="checkFormValidity()">
+        <div style="width: 100%;">
+            <input type="password" id="mdp" class="formTextField" name="pass" placeholder="Entrez votre mot de passe (obligatoire)" oninput="checkFormValidity()">
+            <div class="infoText">8 caractères minimum</div>
+        </div>
+        <div id="singleUseInput" class="inputWithLabelContainer">
+            <input type="checkbox" name="singleUseCheckbox" id="singleUseCheckbox">
+            <label for="singleUseCheckbox">Lien à utilisation unique</label>
+        </div>
+        <div>
+            <div id="expirationTimeHoursInput" class="inputWithLabelContainer">
+                <label for="expirationTimeHours">Expire dans</label>
+                <input type="number" name="expirationTimeHours" id="expirationTimeHours" min="1" max="8760" value="24" oninput="checkFormValidity()">
+                <label for="expirationTimeHours">heure(s)</label>
+            </div>
+            <div class="infoText">Entre 1 heure et 1 an</div>
+        </div>
+        <input type="email" id="email" class="formTextField" name="email" placeholder="Email de réception du lien (obligatoire)" oninput="checkFormValidity()">
+        <button type="button" id="uploadButton" disabled>
+            Upload
+        </button>
     </div>
     <div id="result"></div>
 
     <script>
+        function checkFormValidity() {
+            let isValid = true;
+            const fieldValidator = (isFieldInvalid, htmlElement, displayError) => {
+                isValid = isValid && !isFieldInvalid;
+                htmlElement.setCustomValidity(displayError && isFieldInvalid ? "Bad Input" : "")
+            }
+            const fileInput = document.getElementById('fileInput');
+            fieldValidator(!fileInput.files[0], fileInput);
+            const mdp = document.getElementById('mdp');
+            fieldValidator(mdp.value.length < 8, mdp, mdp.value !== '');
+            const expirationTimeHours = document.getElementById('expirationTimeHours');
+            fieldValidator(isNaN(Number(expirationTimeHours.value))  || Number(expirationTimeHours.value) < 1 || Number(expirationTimeHours.value) > 8760, expirationTimeHours, true)
+            const email = document.getElementById('email');
+            fieldValidator(!(/^\S+@\S+\.\S+$/.test(email.value)), email, email.value !== '');
+            const uploadBtn = document.getElementById('uploadButton');
+            uploadBtn.disabled = !isValid;
+            return isValid;
+        }
+
         function copyLink() {
             const link = document.getElementById("fileLink");
             navigator.clipboard.writeText(link.href);
@@ -29,9 +67,18 @@
         }
 
         async function uploadFile() {
+            if(!checkFormValidity()) return;
+
+            const uploadBtn = document.getElementById("uploadButton");
+            uploadBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading...`;
+            uploadBtn.disabled = true;
+
             const formData = new FormData();
             const fileInput = document.getElementById("fileInput");
             const passwordInput = document.getElementById("mdp");
+            const singleUseCheckbox = document.getElementById("singleUseCheckbox");
+            const expirationTimeHours = document.getElementById("expirationTimeHours");
+            const emailInput = document.getElementById("email");
 
             if(!fileInput.files[0]) {
                 document.getElementById("result").innerText = "Aucun fichier selectionné.";
@@ -43,8 +90,12 @@
                 return;
             }
 
+            //file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)
             formData.append("file", fileInput.files[0]);
+            formData.append("uniqueLink", singleUseCheckbox.checked ?? false);
             formData.append("password", passwordInput.value);
+            formData.append("mailReceiver", emailInput.value);
+            formData.append("expirationTimeHours", expirationTimeHours.value);
 
             try {
                 const response = await fetch("/uploadfile/", {
@@ -64,12 +115,20 @@
                             </button>
                         </div>
                     `;
+                    fileInput.value = null;
+                    passwordInput.value = "";
+                    singleUseCheckbox.checked = false;
+                    expirationTimeHours.value = "";
+                    emailInput.value = "";
                 } else {
                     document.getElementById("result").innerText = `Échec : ${result.Info}`;
                 }
             } catch (err) {
                 console.log(err)
                 document.getElementById("result").innerText = `Erreur`;
+            } finally {
+                uploadBtn.innerHTML = `Upload`;
+                checkFormValidity();
             }
         }
         document.getElementById("mdp").addEventListener("keydown", async (e) => {
