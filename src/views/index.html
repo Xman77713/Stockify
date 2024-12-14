@@ -68,10 +68,11 @@
 
         async function uploadFile() {
             if(!checkFormValidity()) return;
-
             const uploadBtn = document.getElementById("uploadButton");
             uploadBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Uploading...`;
             uploadBtn.disabled = true;
+
+            document.getElementById("result").innerHTML = "";
 
             const formData = new FormData();
             const fileInput = document.getElementById("fileInput");
@@ -121,7 +122,7 @@
                     expirationTimeHours.value = 24;
                     emailInput.value = "";
                 } else {
-                    document.getElementById("result").innerText = `Échec : ${result.Info}`;
+                    document.getElementById("result").innerText = `${responseData.Info} : ${responseData.Error.detail ?? responseData.Error}`;
                 }
             } catch (err) {
                 console.log(err)

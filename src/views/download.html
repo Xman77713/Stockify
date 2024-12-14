@@ -69,7 +69,7 @@
                         document.getElementById("dlResponse").innerText = `Fichier téléchargé`;
                     } else {
                         const responseData = await response.json();
-                        document.getElementById("dlResponse").innerText = `${responseData.Info} (${responseData.Error})`;
+                        document.getElementById("dlResponse").innerText = `${responseData.Info} : ${responseData.Error.detail ?? responseData.Error}`;
                     }
                 } catch (err) {
                     console.log(err)
