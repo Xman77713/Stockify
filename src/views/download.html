@@ -42,21 +42,16 @@
                 // Lire le sel et l'IV depuis le début du fichier
                 const arrayBuffer = await encryptedBlob.arrayBuffer();
                 const salt = new Uint8Array(arrayBuffer.slice(0, 16));
-                console.log('salt', salt);
                 const iv = new Uint8Array(arrayBuffer.slice(16, 28));
-                console.log('iv', iv);
                 const encryptedContent = new Uint8Array(arrayBuffer.slice(28));
-                console.log('Deriving key');
                 // Dérivation de la clé
                 const key = await deriveKey(password, salt);
-                console.log('Déchiffrement...');
                 // Déchiffrement
                 const decryptedContent = await window.crypto.subtle.decrypt(
                     { name: 'AES-GCM', iv: iv },
                     key,
                     encryptedContent
                 );
-                console.log('Déchiffré !');
                 return new Blob([decryptedContent], { type: 'application/octet-stream' });
             }
 
@@ -73,12 +68,10 @@
                 formData.append("token", filePath);
 
                 try {
-                    console.log(filePath);
                     const response = await fetch("/downloadfilelink/", {
                         method: "POST",
                         body: formData,
                     });
-                    console.log(response.ok);
                     if(response.ok && response.headers.get('Content-Type') === 'application/octet-stream') {
                         const contentDispositionHeader = response.headers.get('Content-Disposition');
                         const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-\.]+)(?:; ?|$)/i;
@@ -100,10 +93,8 @@
 
                         const blob = await response.blob();
                         // Déchiffrement du fichier
-                        console.log('Décryptage...')
                         const decryptedBlob = await decryptFile(blob, passwordInput.value);
                         const blobUrl = window.URL.createObjectURL(decryptedBlob);
-                        console.log('Fichier décypté')
 
                         const link = document.createElement('a');
                         link.href = blobUrl;

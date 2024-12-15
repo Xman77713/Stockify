@@ -24,7 +24,6 @@ async def validate_client_encrypted_file(file_data):
         if len(file_data_bytes) < 28:  # Taille minimale (sel + IV)
             raise ValueError("Fichier chiffré trop court")
         
-        print('First check passed')
         # Extraction des composants
         salt = file_data_bytes[:16]
         iv = file_data_bytes[16:28]
@@ -37,7 +36,6 @@ async def validate_client_encrypted_file(file_data):
         if len(iv) != 12:
             raise ValueError("Taille de l'IV invalide")
         
-        print('All checks passed')
 
         return {
             "salt": salt,
@@ -69,12 +67,10 @@ async def uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, mdpP
     except ValueError as e:
         raise SecurityError(f"Validation du fichier échouée : {str(e)}")
     
-    print('Validated !')
     # Récupération des données validées
     salt = validated_file['salt']
     token = createToken()
 
-    print('Salt and token')
     # Chiffrement du nom de fichier (avec un sel serveur)
     encryptFilename = filename # encryptChar(filename.encode("utf-8"), None)  
 
@@ -98,12 +94,5 @@ async def uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, mdpP
             str(token)
         )
     )
-    print('iv')
-    ivArray = list(validated_file['iv'])
-    print(ivArray)
-    print('salt')
-    saltArray = list(salt)
-    print(saltArray)
     conn.commit()
-    print('All good !')
     return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}

@@ -24,9 +24,7 @@ async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
     
     if not queryResult:
         raise FileNotFoundError
-    
-    print('Query fetched !')
-    
+
     # Extraction des données du fichier
     filename = queryResult[0][0]
     iv = queryResult[0][1]

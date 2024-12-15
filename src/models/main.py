@@ -25,7 +25,7 @@ try:
     )
 
     if conn.is_connected():
-        print("Successfully connection !")
+        print("Successful connection !")
         cursor = conn.cursor()
         cursor.execute("USE stockifyDB")
 
@@ -59,7 +59,6 @@ try:
                 deleteExpiredFile(cursor, conn)
                 return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, str(os.getenv('appPassword')), expirationTimeHours)}
             except Exception as e:
-                print('Fail caught API Level !')
                 return {"Info": "Fail", "Error": str(e)}
 
         @app.delete("/deletefileid/")
@@ -103,10 +102,8 @@ try:
             """
             Endpoint POST to download a file
             """
-            print('Starting dl...')
             try:
                 deleteExpiredFile(cursor, conn)
-                print('Deleted expired files')
                 return await downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
