@@ -102,6 +102,7 @@ try:
             """
             try:
                 deleteExpiredFile(cursor, conn)
+                print(token)
                 return downloadFileByToken(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
