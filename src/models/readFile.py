@@ -17,7 +17,7 @@ def readListeFile(cursor):
 async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
     # Récupération des informations du fichier
     cursor.execute(
-        "SELECT name, iv, data, uniqueLink, salt FROM file WHERE token = %s", 
+        "SELECT name, iv, data, uniqueLink, salt, file_size FROM file WHERE token = %s", 
         (token,)
     )
     queryResult = cursor.fetchall()
@@ -31,7 +31,7 @@ async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
     encryptedFileData = queryResult[0][2]
     uniqueLink = queryResult[0][3]
     salt = queryResult[0][4]
-    file_size = len(encryptedFileData)
+    fileSize = queryResult[0][5]
     
     encryptedResponseData = salt+iv+encryptedFileData
     # On renvoie le fichier tel quel
@@ -42,7 +42,7 @@ async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
         raise SecurityError("Structure de fichier chiffré invalide")
 
     # Vérifier que la longueur des données correspond à la taille attendue
-    if len(encryptedResponseData)-28 != file_size:
+    if len(encryptedResponseData) != fileSize:
         raise SecurityError("Taille de fichier incohérente")
     
     with open(filePathTemp, "wb") as directory:

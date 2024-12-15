@@ -83,7 +83,7 @@ async def uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, mdpP
 
     # Stockage du fichier
     cursor.execute(
-        "INSERT INTO file (name, iv, data, uniqueLink, expirationDate, salt, token) VALUES (%s,%s,%s,%s,%s,%s,%s)", 
+        "INSERT INTO file (name, iv, data, uniqueLink, expirationDate, salt, token, file_size) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", 
         (
             encryptFilename, 
             validated_file['iv'], 
@@ -91,7 +91,8 @@ async def uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, mdpP
             uniqueLink, 
             expirationDate, 
             salt, 
-            str(token)
+            str(token),
+            validated_file['file_size']
         )
     )
     conn.commit()

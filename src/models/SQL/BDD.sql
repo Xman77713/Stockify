@@ -11,5 +11,6 @@ CREATE TABLE file (
     uniqueLink boolean NOT NULL,
     expirationDate DATETIME NOT NULL,
     salt BLOB NOT NULL,
-    token TEXT NOT NULL
+    token TEXT NOT NULL,
+    file_size INTEGER
 );
