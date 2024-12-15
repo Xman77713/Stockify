@@ -32,9 +32,9 @@ async def uploadFile(file, uniqueLink, password, conn, cursor, request, mailRece
 
     downloadLink = f"{request.base_url}downloadfilelink/{token}"
 
-    sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate, filename)
-
     cursor.execute("INSERT INTO file (name, iv, data, uniqueLink, expirationDate, salt, token) VALUES (%s,%s,%s,%s,%s,%s,%s)", (encryptFilename, result[0], result[1], uniqueLink, expirationDate, salt, str(token)))
     conn.commit()
+
+    sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate, filename)
 
     return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}
