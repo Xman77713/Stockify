@@ -16,7 +16,6 @@ def readListeFile(cursor):
 
 
 def downloadFileByToken(token, uploadDirectoryTemp, password, bgTask, cursor, conn):
-    print(token)
     cursor.execute("SELECT name, iv, data, uniqueLink, salt FROM file WHERE token=(%s)",(token,))
     queryResult = cursor.fetchall()
 
