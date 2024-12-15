@@ -4,7 +4,7 @@ import mysql.connector
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, HTTPException, Form, BackgroundTasks
 from src.models.deleteFile import deleteFileById, deleteFiles
-from src.models.readFile import readListeFile, downloadFileByName
+from src.models.readFile import readListeFile, downloadFileByToken
 from src.models.uploadFile import uploadFile
 from src.models.deleteFile import deleteExpiredFile
 from starlette.requests import Request
@@ -102,7 +102,7 @@ try:
             """
             try:
                 deleteExpiredFile(cursor, conn)
-                return downloadFileByName(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
+                return downloadFileByToken(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
