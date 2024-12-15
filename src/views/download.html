@@ -25,7 +25,7 @@
                 }
 
                 formData.append("password", passwordInput.value);
-                formData.append("filePath", filePath);
+                formData.append("token", filePath);
 
                 try {
                     const response = await fetch("/downloadfilelink/", {
@@ -34,8 +34,23 @@
                     });
 
                     if(response.ok && response.headers.get('Content-Type') === 'application/octet-stream') {
-                        const header = response.headers.get('Content-Disposition');
-                        const filename = header.split(';')[1].split('=')[1].slice(1,-1);
+                        const contentDispositionHeader = response.headers.get('Content-Disposition');
+                        const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-\.]+)(?:; ?|$)/i;
+                        const asciiFilenameRegex = /^filename=(["']?)(.*?[^\\])\1(?:; ?|$)/i;
+
+                        let fileName = null;
+                        if (utf8FilenameRegex.test(contentDispositionHeader)) {
+                            fileName = decodeURIComponent(utf8FilenameRegex.exec(contentDispositionHeader)[1]);
+                        } else {
+                            const filenameStart = contentDispositionHeader.toLowerCase().indexOf('filename=');
+                            if (filenameStart >= 0) {
+                                const partialDisposition = contentDispositionHeader.slice(filenameStart);
+                                const matches = asciiFilenameRegex.exec(partialDisposition);
+                                if (matches != null && matches[2]) {
+                                    fileName = matches[2];
+                                }
+                            }
+                        }
 
                         const blob = await response.blob();
                         const newBlob = new Blob([blob]);
@@ -43,7 +58,7 @@
 
                         const link = document.createElement('a');
                         link.href = blobUrl;
-                        link.setAttribute('download', `${filename}`);
+                        link.setAttribute('download', `${fileName}`);
                         document.body.appendChild(link);
                         link.click();
                         link.parentNode.removeChild(link);
@@ -53,7 +68,7 @@
                         document.getElementById("dlResponse").innerText = `Fichier téléchargé`;
                     } else {
                         const responseData = await response.json();
-                        document.getElementById("dlResponse").innerText = `${responseData.Info} (${responseData.Error})`;
+                        document.getElementById("dlResponse").innerText = `${responseData.Info} : ${responseData.Error.detail ?? responseData.Error}`;
                     }
                 } catch (err) {
                     console.log(err)

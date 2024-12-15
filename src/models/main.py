@@ -96,13 +96,12 @@ try:
                 return {"Info": "Fail", "Error": str(e)}
 
         @app.post("/downloadfilelink/")
-        def downloadFileByLink(password: str = Form(...), token: str = "", bgTask: BackgroundTasks = None):
+        def downloadFileByLink(password: str = Form(...), token: str = Form(...), bgTask: BackgroundTasks = None):
             """
             Endpoint POST to download a file
             """
             try:
                 deleteExpiredFile(cursor, conn)
-                print(token)
                 return downloadFileByToken(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
