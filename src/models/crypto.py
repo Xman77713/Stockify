@@ -8,9 +8,9 @@ def createKey(password):
 
 def encryptFile(fileData, key):
     cipher = AES.new(key, AES.MODE_CBC)
-    cipher_data = cipher.encrypt(pad(fileData, AES.block_size))
+    cipherData = cipher.encrypt(pad(fileData, AES.block_size))
 
-    return cipher.iv+cipher_data
+    return cipher.iv+cipherData
 
 def decryptFile(filePath, key):
     with open(filePath, "rb") as f:

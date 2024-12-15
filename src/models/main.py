@@ -9,7 +9,7 @@ from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-app = FastAPI()#docs_url=None, redoc_url=None)
+app = FastAPI(docs_url=None, redoc_url=None)
 
 uploadDirectory = "src/models/uploadDirectory"
 uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
