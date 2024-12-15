@@ -29,7 +29,7 @@ try:
         cursor = conn.cursor()
         cursor.execute("USE stockifyDB")
 
-        app = FastAPI()
+        app = FastAPI(redoc_url=None,docs_url=None)
         uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
 
         if not os.path.exists(uploadDirectoryTemp):
@@ -51,7 +51,7 @@ try:
             return templates.TemplateResponse("download.html", {"request": request})
 
         @app.post("/uploadfile/")
-        async def uploadFileAPI(file: UploadFile, uniqueLink: bool = Form(...), password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)):
+        async def uploadFileAPI(file: UploadFile, uniqueLink: bool = Form(...), password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours: str = Form(...)):
             """
             Endpoint to upload a file. The file is saved in the DB
             """
