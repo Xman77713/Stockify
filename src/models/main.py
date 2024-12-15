@@ -80,8 +80,6 @@ try:
             """
             try:
                 return {"Info": "Success", "Function Result": deleteFiles(cursor, conn)}
-            except FileNotFoundError:
-                return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:
                 return {"Info": "Fail", "Error": str(e)}
 
