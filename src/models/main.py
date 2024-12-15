@@ -51,14 +51,15 @@ try:
             return templates.TemplateResponse("download.html", {"request": request})
 
         @app.post("/uploadfile/")
-        async def uploadFileAPI(file: UploadFile, uniqueLink: bool = Form(...), password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)):
+        async def uploadFileAPI(file: UploadFile, uniqueLink: bool = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)):
             """
             Endpoint to upload a file. The file is saved in the DB
             """
             try:
                 deleteExpiredFile(cursor, conn)
-                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, password, conn, cursor, request, mailReceiver, str(os.getenv('appPassword')), expirationTimeHours)}
+                return {"Info": "Success", "Function Result": await uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, str(os.getenv('appPassword')), expirationTimeHours)}
             except Exception as e:
+                print('Fail caught API Level !')
                 return {"Info": "Fail", "Error": str(e)}
 
         @app.delete("/deletefileid/")
@@ -98,13 +99,15 @@ try:
                 return {"Info": "Fail", "Error": str(e)}
 
         @app.post("/downloadfilelink/")
-        def downloadFileByLink(password: str = Form(...), token: str = Form(...), bgTask: BackgroundTasks = None):
+        async def downloadFileByLink(token: str = Form(...), bgTask: BackgroundTasks = None):
             """
             Endpoint POST to download a file
             """
+            print('Starting dl...')
             try:
                 deleteExpiredFile(cursor, conn)
-                return downloadFileByName(token, uploadDirectoryTemp, password, bgTask, cursor, conn)
+                print('Deleted expired files')
+                return await downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn)
             except FileNotFoundError:
                 return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
             except Exception as e:

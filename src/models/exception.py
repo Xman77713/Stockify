@@ -5,6 +5,13 @@ class WrongPasswordError(Exception):
         self.message = message
         super().__init__(self.message)
 
+class SecurityError(Exception):
+    """Exception raised because of security checks"""
+
+    def __init__(self, message="Data compromised."):
+        self.message = message
+        super().__init__(self.message)
+
 class IncorrectMailError(Exception):
     """Exception raised for incorrect mail"""
 

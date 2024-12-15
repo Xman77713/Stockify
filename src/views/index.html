@@ -35,6 +35,55 @@
     <div id="result"></div>
 
     <script>
+        async function deriveKey(password, salt) {
+            // Dérivation de clé PBKDF2
+            const enc = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+
+            return await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            );
+        }
+        async function encryptFile(file, password) {
+            // Dérivation de clé à partir du mot de passe
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            console.log('salt', salt);
+            const key = await deriveKey(password, salt);
+
+            // Conversion du fichier en ArrayBuffer
+            const fileArrayBuffer = await file.arrayBuffer();
+
+            // Chiffrement du fichier
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            console.log('iv', iv);
+            const encryptedContent = await window.crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                fileArrayBuffer
+            );
+
+            // Préparation des données à envoyer
+            return {
+                encryptedFile: new Blob([salt, iv, new Uint8Array(encryptedContent)]),
+                fileName: file.name
+            };
+        }
+
         function checkFormValidity() {
             let isValid = true;
             const fieldValidator = (isFieldInvalid, htmlElement, displayError) => {
@@ -74,31 +123,31 @@
 
             document.getElementById("result").innerHTML = "";
 
-            const formData = new FormData();
             const fileInput = document.getElementById("fileInput");
             const passwordInput = document.getElementById("mdp");
-            const singleUseCheckbox = document.getElementById("singleUseCheckbox");
-            const expirationTimeHours = document.getElementById("expirationTimeHours");
-            const emailInput = document.getElementById("email");
-
             if(!fileInput.files[0]) {
                 document.getElementById("result").innerText = "Aucun fichier selectionné.";
                 return;
             }
-
             if(!passwordInput.value) {
                 document.getElementById("result").innerText = "Veuillez entrer un mot de passe.";
                 return;
             }
 
-            //file: UploadFile, uniqueLink: bool, password: str = Form(...), request: Request = None, mailReceiver: str = Form(...), expirationTimeHours:str = Form(...)
-            formData.append("file", fileInput.files[0]);
-            formData.append("uniqueLink", singleUseCheckbox.checked ?? false);
-            formData.append("password", passwordInput.value);
-            formData.append("mailReceiver", emailInput.value);
-            formData.append("expirationTimeHours", expirationTimeHours.value);
-
             try {
+                // Chiffrement du fichier avant l'upload
+                const { encryptedFile, fileName } = await encryptFile(
+                    fileInput.files[0],
+                    passwordInput.value
+                );
+                const formData = new FormData();
+                const singleUseCheckbox = document.getElementById("singleUseCheckbox");
+                const expirationTimeHours = document.getElementById("expirationTimeHours");
+                const emailInput = document.getElementById("email");
+                formData.append("file", encryptedFile, fileName);
+                formData.append("uniqueLink", singleUseCheckbox.checked ?? false);
+                formData.append("mailReceiver", emailInput.value);
+                formData.append("expirationTimeHours", expirationTimeHours.value);
                 const response = await fetch("/uploadfile/", {
                     method: "POST",
                     body: formData,
