@@ -20,7 +20,6 @@ async def uploadFile(file, uploadDirectory, password, request):
     downloadLink = f"{request.base_url}downloadfilelink/{encryptFilePath}"
 
     with open(filePath, "wb") as directory:
-        directory.write(result[0])
-        directory.write(result[1])
+        directory.write(result)
 
     return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}

@@ -9,7 +9,7 @@ from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-app = FastAPI(docs_url=None, redoc_url=None)
+app = FastAPI()#docs_url=None, redoc_url=None)
 
 uploadDirectory = "src/models/uploadDirectory"
 uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
@@ -55,8 +55,6 @@ def deleteFilesAPI():
     """
     try:
         return {"Info": "Success", "Function Result": deleteFiles(uploadDirectory)}
-    except FileNotFoundError:
-        return {"Info": "Fail", "Error": HTTPException(status_code=404, detail="File not found")}
     except Exception as e:
         return {"Info": "Fail", "Error": str(e)}
 
