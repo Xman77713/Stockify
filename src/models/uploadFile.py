@@ -36,5 +36,5 @@ async def uploadFile(file, uniqueLink, password, conn, cursor, request, mailRece
     conn.commit()
 
     sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate, filename)
-
+    print(downloadLink)
     return {"filename": filename, "download link": downloadLink, "message": "File successfully saved"}
