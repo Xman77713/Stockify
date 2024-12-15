@@ -15,7 +15,7 @@ def deleteFileById(id, conn, cursor):
 def deleteFiles(cursor, conn):
     cursor.execute("DELETE FROM file")
     conn.commit()
-    return {"message": "uploadDirectory successfully cleared"}
+    return {"message": "BDD successfully cleared"}
 
 def deleteFileByPath(filePath):
     filePath = filePath.replace('\\','/')
