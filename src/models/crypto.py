@@ -10,26 +10,25 @@ def createKey(password, salt):
 
 def encryptFile(fileData, key):
     cipher = AES.new(key, AES.MODE_CBC)
-    cipher_data = cipher.encrypt(pad(fileData, AES.block_size))
+    cipherData = cipher.encrypt(pad(fileData, AES.block_size))
 
-    return cipher.iv, cipher_data
+    return cipher.iv, cipherData
 
 def decryptFile(fileData, key, iv):
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-
     return unpad(cipher.decrypt(fileData), AES.block_size)
 
 def encryptChar(char, key):
     cipher = AES.new(key, AES.MODE_CBC)
-    cipher_data = cipher.encrypt(pad(char, AES.block_size))
-    return base64.urlsafe_b64encode(cipher.iv + cipher_data).decode('utf-8')
+    cipherChar = cipher.encrypt(pad(char, AES.block_size))
+    return base64.urlsafe_b64encode(cipher.iv + cipherChar).decode('utf-8')
 
 def decryptChar(char, key):
-    encrypted_data = base64.urlsafe_b64decode(char.encode('utf-8'))
-    iv = encrypted_data[:AES.block_size]
-    cipher_data = encrypted_data[AES.block_size:]
+    encryptedChar = base64.urlsafe_b64decode(char.encode('utf-8'))
+    iv = encryptedChar[:AES.block_size]
+    cipherChar = encryptedChar[AES.block_size:]
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-    decrypted = unpad(cipher.decrypt(cipher_data), AES.block_size)
+    decrypted = unpad(cipher.decrypt(cipherChar), AES.block_size)
 
     return decrypted.decode('utf-8')
 
