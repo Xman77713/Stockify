@@ -19,6 +19,8 @@ def downloadFileByToken(token, uploadDirectoryTemp, password, bgTask, cursor, co
     cursor.execute("SELECT name, iv, data, uniqueLink, salt FROM file WHERE token=(%s)",(token,))
     queryResult = cursor.fetchall()
 
+    print(queryResult)
+
     if not queryResult:
         raise FileNotFoundError
 

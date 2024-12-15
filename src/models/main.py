@@ -29,7 +29,7 @@ try:
         cursor = conn.cursor()
         cursor.execute("USE stockifyDB")
 
-        app = FastAPI(redoc_url=None,docs_url=None)
+        app = FastAPI()#redoc_url=None,docs_url=None)
         uploadDirectoryTemp = "src/models/uploadDirectoryTemp"
 
         if not os.path.exists(uploadDirectoryTemp):
