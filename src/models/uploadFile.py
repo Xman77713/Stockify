@@ -79,7 +79,7 @@ async def uploadFile(file, uniqueLink, conn, cursor, request, mailReceiver, mdpP
     downloadLink = f"{request.base_url}downloadfilelink/{token}"
 
     # Envoi du mail
-    sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate, filename)
+    sendMail(mailReceiver, downloadLink, mdpPassword, uniqueLink, expirationDate)
 
     # Stockage du fichier
     cursor.execute(

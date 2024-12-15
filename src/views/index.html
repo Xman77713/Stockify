@@ -75,10 +75,22 @@
                 fileArrayBuffer
             );
 
+            // Chiffrement du nom du fichier
+            const encoder = new TextEncoder();
+            const fileNameArray = encoder.encode(file.name);
+            const encryptedFileName = await window.crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                fileNameArray
+            );
+            const encryptedFileNameString = btoa(
+                String.fromCharCode(...new Uint8Array(encryptedFileName))
+            );
+
             // Préparation des données à envoyer
             return {
                 encryptedFile: new Blob([salt, iv, new Uint8Array(encryptedContent)]),
-                fileName: file.name
+                fileName: encryptedFileNameString,
             };
         }
 

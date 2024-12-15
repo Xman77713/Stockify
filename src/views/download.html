@@ -38,12 +38,14 @@
                     ['encrypt', 'decrypt']
                 );
             }
-            async function decryptFile(encryptedBlob, password) {
+            async function decryptFile(encryptedBlob, password, encryptedFileNameBase64) {
                 // Lire le sel et l'IV depuis le début du fichier
                 const arrayBuffer = await encryptedBlob.arrayBuffer();
                 const salt = new Uint8Array(arrayBuffer.slice(0, 16));
                 const iv = new Uint8Array(arrayBuffer.slice(16, 28));
                 const encryptedContent = new Uint8Array(arrayBuffer.slice(28));
+                const encryptedFileName = Uint8Array.fromBase64(decodeURIComponent(decodeURIComponent(encryptedFileNameBase64)));
+
                 // Dérivation de la clé
                 const key = await deriveKey(password, salt);
                 // Déchiffrement
@@ -52,7 +54,15 @@
                     key,
                     encryptedContent
                 );
-                return new Blob([decryptedContent], { type: 'application/octet-stream' });
+                // Déchiffrement du nom du fichier
+                const decryptedFileNameArrayBuffer = await window.crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    encryptedFileName
+                );
+                const decoder = new TextDecoder();
+                const decryptedFileName = decoder.decode(decryptedFileNameArrayBuffer);
+                return {decryptedBlob: new Blob([decryptedContent], {type: 'application/octet-stream'}), decryptedFileName: decryptedFileName};
             }
 
             async function downloadFile() {
@@ -74,31 +84,19 @@
                     });
                     if(response.ok && response.headers.get('Content-Type') === 'application/octet-stream') {
                         const contentDispositionHeader = response.headers.get('Content-Disposition');
-                        const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-\.]+)(?:; ?|$)/i;
-                        const asciiFilenameRegex = /^filename=(["']?)(.*?[^\\])\1(?:; ?|$)/i;
 
-                        let fileName = null;
-                        if (utf8FilenameRegex.test(contentDispositionHeader)) {
-                            fileName = decodeURIComponent(utf8FilenameRegex.exec(contentDispositionHeader)[1]);
-                        } else {
-                            const filenameStart = contentDispositionHeader.toLowerCase().indexOf('filename=');
-                            if (filenameStart >= 0) {
-                                const partialDisposition = contentDispositionHeader.slice(filenameStart);
-                                const matches = asciiFilenameRegex.exec(partialDisposition);
-                                if (matches != null && matches[2]) {
-                                    fileName = matches[2];
-                                }
-                            }
+                        let fileName = contentDispositionHeader.split('filename*=utf-8\'\'')[1];
+                        if(!fileName) {
+                            fileName = contentDispositionHeader.split('filename=')[1].split('"')[1];
                         }
-
                         const blob = await response.blob();
                         // Déchiffrement du fichier
-                        const decryptedBlob = await decryptFile(blob, passwordInput.value);
+                        const {decryptedBlob, decryptedFileName} = await decryptFile(blob, passwordInput.value, fileName);
                         const blobUrl = window.URL.createObjectURL(decryptedBlob);
 
                         const link = document.createElement('a');
                         link.href = blobUrl;
-                        link.setAttribute('download', `${fileName}`);
+                        link.setAttribute('download', `${decryptedFileName}`);
                         document.body.appendChild(link);
                         link.click();
                         link.parentNode.removeChild(link);

@@ -21,9 +21,12 @@ async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
         (token,)
     )
     queryResult = cursor.fetchall()
-    
+
+    print('fetched query')
     if not queryResult:
         raise FileNotFoundError
+    
+    print('extracting...')
 
     # Extraction des données du fichier
     filename = queryResult[0][0]
@@ -35,8 +38,7 @@ async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
     
     encryptedResponseData = salt+iv+encryptedFileData
     # On renvoie le fichier tel quel
-    filePathTemp = os.path.join(uploadDirectoryTemp, filename)
-
+    filePathTemp = os.path.join(uploadDirectoryTemp, 'temp')
     # Vérification de base de la structure
     if len(encryptedResponseData) < 28:  # sel + IV
         raise SecurityError("Structure de fichier chiffré invalide")
@@ -44,10 +46,8 @@ async def downloadFileByName(token, uploadDirectoryTemp, bgTask, cursor, conn):
     # Vérifier que la longueur des données correspond à la taille attendue
     if len(encryptedResponseData) != fileSize:
         raise SecurityError("Taille de fichier incohérente")
-    
     with open(filePathTemp, "wb") as directory:
         directory.write(encryptedResponseData)
-    
     # Tâche en arrière-plan pour supprimer le fichier temporaire
     bgTask.add_task(deleteFileByPath, filePathTemp)
     
